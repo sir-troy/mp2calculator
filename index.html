@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pag-IBIG MP2 Calculator</title>
+<meta name="version" content="1.0">
+<style>
+  :root {
+    --ink: #17221f;
+    --muted: #5b6763;
+    --line: #e2ddd2;
+    --paper: #f6f2ea;
+    --card: #ffffff;
+    --green: #0f5b46;
+    --green-2: #157a5e;
+    --green-soft: #e4f0ea;
+    --gold: #e9a512;
+    --gold-soft: #fbf0d4;
+    --red: #a3361c;
+    --radius: 16px;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* Disclaimer banner */
+  .disclaimer {
+    background: var(--ink); color: #fff; text-align: center;
+    padding: 22px 20px; font-size: 17px; line-height: 1.5;
+    border-bottom: 5px solid var(--gold);
+  }
+  .disclaimer strong { color: var(--gold); letter-spacing: .05em; text-transform: uppercase; font-size: 20px; display: block; margin-bottom: 4px; }
+  .disclaimer a { color: #fff; text-underline-offset: 3px; }
+
+  /* Header */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand-name { font-weight: 800; font-size: 19px; letter-spacing: -.01em; line-height: 1.1; }
+  .brand-name small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: .02em; }
+  nav { display: flex; gap: 4px; }
+  nav a { text-decoration: none; font-size: 15px; font-weight: 600; padding: 8px 12px; border-radius: 999px; color: var(--muted); transition: background .2s, color .2s; }
+  nav a:hover { background: #ebe5d8; color: var(--ink); }
+  @media (max-width: 640px) { nav { display: none; } }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 36px 0 56px; }
+  @media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 16px; } .hero-art { order: -1; max-width: 360px; } }
+  .eyebrow { display: inline-block; background: var(--gold-soft); color: #7a5300; font-weight: 700; font-size: 13px; padding: 5px 12px; border-radius: 999px; margin-bottom: 16px; }
+  .hero h1 { font-size: clamp(34px, 5vw, 54px); line-height: 1.05; letter-spacing: -.025em; margin: 0 0 16px; font-weight: 800; }
+  .hero h1 em { font-style: normal; color: var(--green); position: relative; white-space: nowrap; }
+  .hero h1 em::after { content: ""; position: absolute; left: 0; right: 0; bottom: .04em; height: .18em; background: var(--gold); opacity: .55; z-index: -1; border-radius: 4px; transform-origin: left; animation: underline 1s .5s var(--ease) both; }
+  @keyframes underline { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .hero p.lead { font-size: 19px; color: var(--muted); margin: 0 0 26px; max-width: 34em; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700; border: 0; cursor: pointer; text-decoration: none;
+    background: var(--green); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 16px; transition: transform .15s, background .2s, box-shadow .2s; box-shadow: 0 6px 18px -8px rgba(15,91,70,.7); }
+  .btn:hover { background: var(--green-2); transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: none; border: 1.5px solid #cfc8b8; }
+  .btn.ghost:hover { background: #ece6d9; }
+  .hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .hero-art { width: 100%; justify-self: center; }
+  .hero-art svg { width: 100%; height: auto; display: block; }
+  .stack { transform-origin: bottom; transform-box: fill-box; animation: rise .9s var(--ease) both; }
+  .stack:nth-of-type(1) { animation-delay: .15s; } .stack:nth-of-type(2) { animation-delay: .3s; }
+  .stack:nth-of-type(3) { animation-delay: .45s; } .stack:nth-of-type(4) { animation-delay: .6s; }
+  .stack:nth-of-type(5) { animation-delay: .75s; }
+  @keyframes rise { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+  .drop { animation: drop 2.4s 1.4s ease-in infinite; }
+  @keyframes drop { 0% { transform: translateY(-60px); opacity: 0; } 15% { opacity: 1; } 55% { transform: translateY(0); opacity: 1; } 70%,100% { transform: translateY(0); opacity: 0; } }
+  .trend { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.4s 1s var(--ease) forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* Sections */
+  section { scroll-margin-top: 16px; }
+  .section-head { margin-bottom: 22px; }
+  .section-head h2 { font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.02em; margin: 0 0 6px; line-height: 1.15; }
+  .section-head p { margin: 0; color: var(--muted); font-size: 17px; }
+
+  .perks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 64px; }
+  @media (max-width: 960px) { .perks { grid-template-columns: repeat(2, 1fr); } }
+  .perk { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; transition: transform .25s var(--ease), box-shadow .25s, border-color .25s; }
+  .perk:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(23,34,31,.35); border-color: #cfe1d8; }
+  .perk .pi { width: 44px; height: 44px; border-radius: 12px; background: var(--green); color: var(--gold); display: grid; place-items: center; margin-bottom: 14px; transition: transform .3s var(--ease); }
+  .perk:hover .pi { transform: rotate(-6deg) scale(1.06); }
+  .perk .pi svg { width: 22px; height: 22px; }
+  .perk h3 { margin: 0 0 4px; font-size: 17px; }
+  .perk p { margin: 0; color: var(--muted); font-size: 15px; }
+  .reveal.in .perk { animation: fade .5s var(--ease) both; }
+  .reveal.in .perk:nth-child(2) { animation-delay: .05s; } .reveal.in .perk:nth-child(3) { animation-delay: .1s; } .reveal.in .perk:nth-child(4) { animation-delay: .15s; }
+  .reveal.in .perk:nth-child(5) { animation-delay: .2s; } .reveal.in .perk:nth-child(6) { animation-delay: .25s; } .reveal.in .perk:nth-child(7) { animation-delay: .3s; } .reveal.in .perk:nth-child(8) { animation-delay: .35s; }
+  @media (max-width: 560px) {
+    .perks { grid-template-columns: 1fr; gap: 10px; }
+    .perk { display: flex; gap: 14px; align-items: flex-start; padding: 16px; }
+    .perk .pi { margin: 0; flex: none; width: 40px; height: 40px; }
+  }
+  .basics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 64px; }
+  @media (max-width: 900px) { .basics { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .basics { grid-template-columns: 1fr; } }
+  .basic { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; transition: transform .25s var(--ease), box-shadow .25s; }
+  .basic:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(23,34,31,.35); }
+  .basic .step { width: 34px; height: 34px; border-radius: 10px; background: var(--green-soft); color: var(--green); display: grid; place-items: center; font-weight: 800; margin-bottom: 12px; }
+  .basic h3 { margin: 0 0 4px; font-size: 17px; }
+  .basic p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* Calculator */
+  .calc { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 22px; align-items: start; margin-bottom: 64px; }
+  @media (max-width: 960px) { .calc { grid-template-columns: minmax(0, 1fr); } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  .results { position: sticky; top: 16px; }
+  @media (max-width: 960px) { .results { position: static; } }
+
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: #f1ece1; padding: 5px; border-radius: 12px; margin-bottom: 22px; position: relative; }
+  .tabs button { position: relative; z-index: 1; font: inherit; font-weight: 700; font-size: 15px; border: 0; background: transparent; padding: 11px 10px; border-radius: 9px; cursor: pointer; color: var(--muted); transition: color .25s; line-height: 1.25; }
+  .tabs button small { display: block; font-weight: 500; font-size: 12px; }
+  .tabs button[aria-selected="true"] { color: var(--ink); }
+  .tabs .pill { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(50% - 5px); background: #fff; border-radius: 9px; box-shadow: 0 2px 8px -3px rgba(0,0,0,.2); transition: transform .35s var(--ease); }
+  .tabs[data-active="custom"] .pill { transform: translateX(100%); }
+
+  .panel { animation: fade .35s var(--ease); }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .field { margin-bottom: 20px; }
+  .field > label, .field > .label { display: block; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .help { display: block; color: var(--muted); font-size: 14px; font-weight: 400; margin-top: 2px; }
+  .money { display: flex; align-items: center; border: 1.5px solid #d8d1c2; border-radius: 12px; background: #fff; transition: border-color .2s, box-shadow .2s; }
+  .money:focus-within { border-color: var(--green); box-shadow: 0 0 0 4px rgba(15,91,70,.12); }
+  .money span { padding: 0 4px 0 14px; color: var(--muted); font-weight: 600; }
+  .money span.after { padding: 0 14px 0 4px; }
+  .money input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 18px; font-weight: 600; padding: 12px 12px 12px 4px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .money.big input { font-size: 22px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { font: inherit; font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 999px; cursor: pointer; border: 1.5px solid #d8d1c2; background: #fff; color: var(--ink); transition: all .2s; font-variant-numeric: tabular-nums; }
+  .chip:hover { border-color: var(--green); }
+  .chip[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+
+  .warn { color: var(--red); font-size: 14px; margin-top: 6px; font-weight: 600; }
+
+  .choice { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 460px) { .choice { grid-template-columns: 1fr; } }
+  .choice label { display: block; border: 1.5px solid #d8d1c2; border-radius: 12px; padding: 12px 14px; cursor: pointer; transition: border-color .2s, background .2s; position: relative; }
+  .choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .choice b { display: block; font-size: 15px; }
+  .choice span { display: block; font-size: 13px; color: var(--muted); }
+  .choice label:has(input:checked) { border-color: var(--green); background: var(--green-soft); }
+  .choice label:has(input:focus-visible) { box-shadow: 0 0 0 4px rgba(15,91,70,.18); }
+  .choice label::after { content: ""; position: absolute; top: 12px; right: 12px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #c9c1b0; background: #fff; transition: all .2s; }
+  .choice label:has(input:checked)::after { border-color: var(--green); background: var(--green); box-shadow: inset 0 0 0 3px #fff; }
+
+  .divider { height: 1px; background: var(--line); margin: 4px 0 20px; }
+  .shared-title { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin: 0 0 14px; }
+
+  /* Custom table */
+  .startrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  select { font: inherit; font-weight: 600; width: 100%; padding: 12px 36px 12px 14px; border: 1.5px solid #d8d1c2; border-radius: 12px; background: #fff; color: var(--ink); appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 54%, calc(100% - 13px) 54%; background-size: 5px 5px; background-repeat: no-repeat; }
+  select:focus { outline: 0; border-color: var(--green); box-shadow: 0 0 0 4px rgba(15,91,70,.12); }
+
+  .years { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
+  .years button { font: inherit; border: 1.5px solid #d8d1c2; background: #fff; border-radius: 10px; padding: 8px 4px; cursor: pointer; transition: all .2s; line-height: 1.2; }
+  .years button b { display: block; font-size: 14px; }
+  .years button span { display: block; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .years button[aria-selected="true"] { border-color: var(--green); background: var(--green); color: #fff; }
+  .years button[aria-selected="true"] span { color: #d6ebe2; }
+
+  .months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media (max-width: 520px) { .months { grid-template-columns: repeat(2, 1fr); } }
+  .month { border: 1.5px solid #e1dbcf; border-radius: 10px; padding: 7px 10px 6px; background: #fcfbf8; transition: border-color .2s, background .2s; }
+  .month:focus-within { border-color: var(--green); background: #fff; }
+  .month.filled { background: #fff; border-color: #bcd8cc; }
+  .month.low { border-color: #e2a08f; background: #fdf3f0; }
+  .month label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .month div { display: flex; align-items: baseline; gap: 2px; }
+  .month div span { color: var(--muted); font-size: 14px; }
+  .month input { width: 100%; border: 0; outline: 0; background: transparent; font: inherit; font-weight: 700; font-size: 16px; padding: 2px 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .month input::placeholder { color: #b9b2a3; font-weight: 500; }
+  .month.pop { animation: pop .35s var(--ease); }
+  @keyframes pop { 50% { transform: scale(1.04); } }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 4px; }
+  .tools .money { flex: 0 1 150px; border-radius: 10px; }
+  .tools .money input { font-size: 15px; padding: 8px 8px 8px 2px; }
+  .tools .money span { padding-left: 10px; }
+  .sbtn { font: inherit; font-size: 14px; font-weight: 700; border-radius: 10px; padding: 9px 12px; cursor: pointer; border: 1.5px solid #d8d1c2; background: #fff; color: var(--ink); transition: all .2s; }
+  .sbtn:hover { border-color: var(--green); color: var(--green); }
+  .sbtn.primary { background: var(--green); border-color: var(--green); color: #fff; }
+  .sbtn.primary:hover { background: var(--green-2); color: #fff; }
+  .sbtn.danger:hover { border-color: var(--red); color: var(--red); }
+  .tiny { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+
+  /* Results */
+  .res-label { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin: 0 0 4px; }
+  .total { font-size: clamp(38px, 5vw, 50px); font-weight: 800; letter-spacing: -.03em; color: var(--green); line-height: 1.05; margin: 0 0 6px; font-variant-numeric: tabular-nums; }
+  .sentence { font-size: 16px; color: var(--muted); margin: 0 0 20px; }
+  .sentence b { color: var(--ink); }
+
+  .split { height: 14px; border-radius: 999px; background: #eee8dc; overflow: hidden; display: flex; margin-bottom: 12px; }
+  .split i { display: block; height: 100%; transition: width .7s var(--ease); }
+  .split .a { background: var(--green); }
+  .split .b { background: var(--gold); }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .legend div { background: #faf8f3; border-radius: 12px; padding: 12px 14px; }
+  .legend dt { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .legend dt::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--green); }
+  .legend div:nth-child(2) dt::before { background: var(--gold); }
+  .legend dd { margin: 2px 0 0; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+  .chart { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: end; height: 190px; padding: 0 4px; border-bottom: 1.5px solid var(--line); }
+  .bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; }
+  .bar .col { display: flex; flex-direction: column; justify-content: flex-end; border-radius: 8px 8px 3px 3px; overflow: hidden; transform-origin: bottom; transition: height .7s var(--ease); min-height: 2px; }
+  .bar .d { background: var(--gold); transition: height .7s var(--ease); }
+  .bar .c { background: var(--green); flex: 1; }
+  .bar .val { font-size: 11.5px; font-weight: 700; text-align: center; color: var(--ink); margin-bottom: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .xlabels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 6px 4px 0; text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .chart-note { font-size: 13px; color: var(--muted); margin: 10px 0 18px; }
+
+  details.breakdown { border-top: 1px solid var(--line); padding-top: 12px; }
+  details.breakdown summary { cursor: pointer; font-weight: 700; font-size: 15px; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  details.breakdown summary::-webkit-details-marker { display: none; }
+  details.breakdown summary::after { content: "+"; font-size: 22px; color: var(--muted); transition: transform .25s; line-height: 1; }
+  details.breakdown[open] summary::after { transform: rotate(45deg); }
+  .tablewrap { overflow-x: auto; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; padding-left: 0; }
+  th:last-child, td:last-child { padding-right: 0; }
+  th { font-size: 12px; color: var(--muted); font-weight: 700; }
+  tfoot td { font-weight: 800; border-bottom: 0; }
+
+  .res-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  /* FAQ */
+  .faq { display: grid; gap: 10px; margin-bottom: 64px; max-width: 820px; }
+  .faq details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 0 20px; transition: box-shadow .2s; }
+  .faq details[open] { box-shadow: 0 10px 26px -18px rgba(23,34,31,.35); }
+  .faq summary { cursor: pointer; font-weight: 700; font-size: 17px; padding: 17px 30px 17px 0; list-style: none; position: relative; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 24px; color: var(--green); transition: transform .25s; }
+  .faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+  .faq .ans { padding: 0 0 18px; color: var(--muted); }
+  .faq .ans p { margin: 0 0 8px; }
+  .faq details[open] .ans { animation: fade .35s var(--ease); }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 96px; color: var(--muted); font-size: 14px; }
+  footer p { margin: 0 0 10px; max-width: 64em; }
+  footer .privacy { display: inline-flex; gap: 8px; align-items: flex-start; background: var(--green-soft); color: var(--green); font-weight: 600; padding: 10px 14px; border-radius: 10px; }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+    .trend { stroke-dashoffset: 0; }
+  }
+
+  /* Language switch */
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .lang { display: inline-flex; background: #ebe5d8; border-radius: 999px; padding: 3px; }
+  .lang button { font: inherit; font-size: 13px; font-weight: 700; border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: background .2s, color .2s; }
+  .lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  body.switching .wrap, body.switching .disclaimer { animation: fade .35s var(--ease); }
+
+  .rate-src { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); font-weight: 600; margin-top: 8px; }
+  .rate-src i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .rate-src.off { color: var(--muted); } .rate-src.off i { background: #b9b2a3; }
+
+  .faq-group { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin: 18px 0 2px; }
+  .faq-group:first-child { margin-top: 0; }
+  .faq ul { margin: 4px 0 8px; padding-left: 20px; }
+  .faq li { margin-bottom: 3px; }
+
+  .copyright { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--line); margin-top: 22px; padding-top: 18px; font-size: 13px; }
+  .choice b { color: var(--ink); }
+
+  /* Mobile tuning */
+  .card { min-width: 0; }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 16px; }
+    .disclaimer { padding: 16px; font-size: 15px; }
+    .disclaimer strong { font-size: 17px; }
+    .top { padding: 14px 0; }
+    .brand svg { width: 38px; height: 38px; }
+    .brand-name { font-size: 17px; }
+    .hero { gap: 20px; padding-bottom: 40px; }
+    .hero p.lead { font-size: 17px; }
+    .hero-ctas .btn { flex: 1 1 auto; justify-content: center; }
+    .card { padding: 18px 16px; }
+    .section-head p { font-size: 16px; }
+    .tools .money { flex: 1 1 100%; }
+    .tools .sbtn { flex: 1 1 auto; }
+    .chart { gap: 6px; height: 170px; }
+    .xlabels { gap: 6px; }
+    .bar .val { font-size: 10.5px; }
+    .legend dd { font-size: 18px; }
+    .years { gap: 4px; }
+    .years button { padding: 7px 2px; }
+    .years button b { font-size: 13px; }
+    .cta { border-radius: 18px; }
+    .cta .btns .btn { flex: 1 1 100%; justify-content: center; }
+    .copyright { flex-direction: column; }
+    .faq summary { font-size: 16px; }
+    .sheet { padding: 20px 18px; border-radius: 16px; }
+    .modal { padding: 12px; align-items: end; }
+  }
+  @media (max-width: 380px) {
+    .brand-name small { display: none; }
+    .lang button { padding: 6px 9px; font-size: 12px; }
+    .tabs button { font-size: 14px; padding: 10px 6px; }
+    .months { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Floating like button */
+  .like {
+    position: fixed; right: 20px; bottom: 20px; z-index: 50;
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+    background: #fff; color: var(--ink); border: 1.5px solid var(--line);
+    padding: 10px 16px 10px 12px; border-radius: 999px;
+    box-shadow: 0 10px 28px -12px rgba(23,34,31,.45);
+    transition: transform .2s var(--ease), box-shadow .2s, border-color .2s, background .2s;
+    animation: likeIn .6s 1.2s var(--ease) both;
+  }
+  @keyframes likeIn { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
+  .like:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -12px rgba(23,34,31,.5); }
+  .like svg { width: 22px; height: 22px; flex: none; overflow: visible; }
+  .like .heart { fill: none; stroke: var(--ink); stroke-width: 2; transition: fill .2s, stroke .2s; transform-origin: center; transform-box: fill-box; }
+  .like[aria-pressed="true"] { border-color: #f1b8a8; background: #fff6f3; }
+  .like[aria-pressed="true"] .heart { fill: #d6452b; stroke: #d6452b; }
+  .like.beat .heart { animation: beat .5s var(--ease); }
+  @keyframes beat { 30% { transform: scale(1.35); } 60% { transform: scale(.9); } }
+  .like .burst { position: absolute; left: 23px; top: 50%; pointer-events: none; }
+  .like .burst i { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0; }
+  .like.beat .burst i { animation: burst .6s var(--ease) forwards; }
+  @keyframes burst { 0% { opacity: 1; transform: translate(-50%,-50%) rotate(var(--a)) translateY(0); } 100% { opacity: 0; transform: translate(-50%,-50%) rotate(var(--a)) translateY(-26px); } }
+  .like .lc { font-variant-numeric: tabular-nums; min-width: 1ch; }
+  .like-tip { position: fixed; right: 20px; bottom: 76px; z-index: 50; max-width: 260px; background: var(--ink); color: #fff; font-size: 13px; padding: 10px 12px; border-radius: 10px; box-shadow: 0 10px 24px -12px rgba(0,0,0,.5); animation: fade .3s var(--ease); }
+  @media (max-width: 520px) { .like { right: 14px; bottom: 14px; } .like-tip { right: 14px; bottom: 68px; } }
+
+  /* Floating action group */
+  .fab { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: flex; gap: 8px; animation: likeIn .6s 1.2s var(--ease) both; }
+  .fab .like { position: relative; right: auto; bottom: auto; animation: none; }
+  .fbtn { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+    background: var(--ink); color: #fff; border: 1.5px solid var(--ink); padding: 10px 16px 10px 12px; border-radius: 999px;
+    box-shadow: 0 10px 28px -12px rgba(23,34,31,.45); transition: transform .2s var(--ease), background .2s; }
+  .fbtn:hover { transform: translateY(-2px); background: #26332f; }
+  .fbtn svg { width: 20px; height: 20px; flex: none; }
+  @media (max-width: 520px) { .fab { right: 14px; bottom: 14px; } .fab .lbl { display: none; } .fbtn, .fab .like { padding: 10px 14px; } }
+
+  /* Feedback modal */
+  .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(23,34,31,.45); animation: fade .25s var(--ease); }
+  .sheet { width: 100%; max-width: 460px; max-height: calc(100vh - 40px); overflow: auto; background: #fff; border-radius: 18px; padding: 24px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.4); animation: sheetIn .35s var(--ease); }
+  @keyframes sheetIn { from { transform: translateY(16px) scale(.98); opacity: 0; } to { transform: none; opacity: 1; } }
+  .sheet h3 { margin: 0 0 4px; font-size: 22px; letter-spacing: -.01em; }
+  .sheet > p { margin: 0 0 18px; color: var(--muted); font-size: 15px; }
+  .sheet .field { margin-bottom: 14px; }
+  .sheet input[type=text], .sheet input[type=email], .sheet textarea { width: 100%; font: inherit; font-size: 16px; padding: 11px 14px; border: 1.5px solid #d8d1c2; border-radius: 12px; background: #fff; color: var(--ink); transition: border-color .2s, box-shadow .2s; }
+  .sheet textarea { min-height: 120px; resize: vertical; }
+  .sheet input:focus, .sheet textarea:focus { outline: 0; border-color: var(--green); box-shadow: 0 0 0 4px rgba(15,91,70,.12); }
+  .sheet .opt { font-weight: 500; color: var(--muted); font-size: 13px; }
+  .sheet .row-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px; }
+  .sheet .note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .sheet .done { text-align: center; padding: 10px 0 4px; }
+  .sheet .done svg { width: 54px; height: 54px; color: var(--green); }
+  .sheet .done .ck { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .6s .15s var(--ease) forwards; }
+  .owner-box { margin-top: 18px; background: var(--card); border: 1px dashed #cfc8b8; border-radius: 12px; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; }
+  .owner-box b { color: var(--ink); }
+
+  /* CTA band */
+  .cta { position: relative; overflow: hidden; background: var(--green); color: #fff; border-radius: 24px; padding: 40px; margin-bottom: 64px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; }
+  @media (max-width: 860px) { .cta { grid-template-columns: 1fr; padding: 28px 22px; } }
+  .cta::before { content: ""; position: absolute; right: -80px; top: -80px; width: 260px; height: 260px; border-radius: 50%; background: rgba(233,165,18,.18); }
+  .cta::after { content: ""; position: absolute; right: 60px; bottom: -110px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.06); }
+  .cta h2 { font-size: clamp(28px, 3.6vw, 38px); line-height: 1.1; letter-spacing: -.02em; margin: 0 0 10px; position: relative; }
+  .cta h2 em { font-style: normal; color: var(--gold); }
+  .cta p { margin: 0 0 22px; color: #cfe5db; font-size: 17px; position: relative; }
+  .cta .btns { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+  .cta .btn { background: var(--gold); color: var(--ink); box-shadow: 0 8px 20px -10px rgba(0,0,0,.5); }
+  .cta .btn:hover { background: #f4b733; }
+  .cta .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.45); }
+  .cta .btn.ghost:hover { background: rgba(255,255,255,.08); }
+  .cta ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; position: relative; counter-reset: s; }
+  .cta li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 14px 16px; }
+  .cta li::before { content: counter(s); flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--gold); color: var(--ink); font-weight: 800; display: grid; place-items: center; font-size: 14px; }
+  .cta li b { display: block; }
+  .cta li span { color: #cfe5db; font-size: 14px; }
+  .cta .leave { display: block; font-size: 12.5px; color: #a9cdbd; margin-top: 12px; position: relative; }
+  .res-cta { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--gold-soft); border-radius: 12px; padding: 12px 14px; margin-top: 16px; font-size: 14px; font-weight: 600; color: #6b4a00; text-decoration: none; transition: background .2s; }
+  .res-cta:hover { background: #f7e6b8; }
+
+  /* Footer stats + version */
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; }
+  .stat { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+  .stat svg { width: 18px; height: 18px; flex: none; color: var(--green); }
+  .stat b { color: var(--ink); font-size: 16px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 13px; }
+  .ver { display: inline-flex; align-items: center; gap: 6px; }
+  .ver code { font: 700 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--ink); color: #fff; padding: 4px 7px; border-radius: 6px; }
+  details.changelog { margin-top: 10px; font-size: 13px; }
+  details.changelog summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+  details.changelog ul { margin: 8px 0 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+
+<div class="disclaimer" role="note">
+  <strong data-i18n="disc_t">Unofficial calculator</strong>
+  <span data-i18n="disc_b">This website is <u>not</u> associated with, endorsed by, or operated by Pag-IBIG Fund (HDMF). It only gives estimates.
+  For official information, visit</span> <a href="https://www.pagibigfund.gov.ph" rel="noopener">pagibigfund.gov.ph</a>.
+</div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top" aria-label="MP2 Calculator">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+        <rect width="44" height="44" rx="12" fill="#0f5b46"/>
+        <g fill="#e9a512">
+          <rect x="9" y="27" width="7" height="8" rx="2"/>
+          <rect x="18.5" y="21" width="7" height="14" rx="2"/>
+          <rect x="28" y="13" width="7" height="22" rx="2"/>
+        </g>
+        <circle cx="31.5" cy="8.5" r="3" fill="#fff"/>
+      </svg>
+      <span class="brand-name">MP2 Calculator<small data-i18n="brand_sub">Unofficial savings estimator</small></span>
+    </a>
+    <div class="top-right">
+      <nav aria-label="Sections">
+        <a href="#perks" data-i18n="nav0">Perks</a>
+        <a href="#basics" data-i18n="nav1">How MP2 works</a>
+        <a href="#calculator" data-i18n="nav2">Calculator</a>
+        <a href="#faq" data-i18n="nav3">Questions</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">English</button>
+        <button type="button" data-lang="tl" aria-pressed="false">Tagalog</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="top">
+    <div>
+      <span class="eyebrow" data-i18n="eyebrow">Free · No sign-up · Your numbers stay private</span>
+      <h1 data-i18n="h1">See how your MP2 savings <em>grow in 5 years.</em></h1>
+      <p class="lead" data-i18n="lead">Type how much you plan to save. We'll show you how much you could get back, peso by peso, in plain words.</p>
+      <div class="hero-ctas">
+        <a class="btn" href="#calculator"><span data-i18n="cta1">Start calculating</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </a>
+        <a class="btn ghost" href="#basics" data-i18n="cta2">What is MP2?</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 400 320">
+        <rect x="10" y="20" width="380" height="290" rx="28" fill="#fff" stroke="#e2ddd2"/>
+        <line x1="44" y1="262" x2="356" y2="262" stroke="#e2ddd2" stroke-width="2"/>
+        <g>
+          <g class="stack"><rect x="58" y="214" width="44" height="48" rx="8" fill="#0f5b46"/><rect x="58" y="206" width="44" height="10" rx="5" fill="#e9a512"/></g>
+          <g class="stack"><rect x="118" y="182" width="44" height="80" rx="8" fill="#0f5b46"/><rect x="118" y="170" width="44" height="14" rx="6" fill="#e9a512"/></g>
+          <g class="stack"><rect x="178" y="148" width="44" height="114" rx="8" fill="#0f5b46"/><rect x="178" y="132" width="44" height="18" rx="7" fill="#e9a512"/></g>
+          <g class="stack"><rect x="238" y="114" width="44" height="148" rx="8" fill="#0f5b46"/><rect x="238" y="92" width="44" height="24" rx="8" fill="#e9a512"/></g>
+          <g class="stack"><rect x="298" y="78" width="44" height="184" rx="8" fill="#0f5b46"/><rect x="298" y="50" width="44" height="30" rx="8" fill="#e9a512"/></g>
+        </g>
+        <path class="trend" d="M80 196 L140 160 L200 122 L260 82 L320 40" fill="none" stroke="#17221f" stroke-width="3" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="600"/>
+        <g class="drop"><circle cx="320" cy="24" r="12" fill="#e9a512" stroke="#c88a05" stroke-width="2"/><text x="320" y="29" text-anchor="middle" font-size="13" font-weight="800" fill="#7a5300" font-family="Arial">₱</text></g>
+        <g font-family="-apple-system, Segoe UI, Arial" font-size="13" font-weight="700" fill="#5b6763" text-anchor="middle">
+          <text x="80" y="286">1</text><text x="140" y="286">2</text><text x="200" y="286">3</text><text x="260" y="286">4</text><text x="320" y="286">5</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section id="perks" class="reveal">
+    <div class="section-head">
+      <h2 data-i18n="pk_h">Why save in MP2?</h2>
+      <p data-i18n="pk_p">The perks that make MP2 one of the most popular ways Filipinos grow their savings.</p>
+    </div>
+    <div class="perks">
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div><div><h3 data-i18n="p1_h">Higher earnings</h3><p data-i18n="p1_p">Dividends are set higher than regular Pag-IBIG savings. Recent rates have been around 7% a year.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 15l6-6"/><circle cx="9.5" cy="9.5" r="1"/><circle cx="14.5" cy="14.5" r="1"/></svg></div><div><h3 data-i18n="p2_h">Tax-free</h3><p data-i18n="p2_p">Every peso of dividend is yours. No tax is taken from what MP2 adds.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><div><h3 data-i18n="p3_h">Government-guaranteed</h3><p data-i18n="p3_p">Your savings are guaranteed by the national government through Pag-IBIG Fund.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/></svg></div><div><h3 data-i18n="p4_h">Start with ₱500</h3><p data-i18n="p4_p">No big amount needed. ₱500 is enough for your first deposit.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M9 14l2 2 4-4"/></svg></div><div><h3 data-i18n="p5_h">Save on your own terms</h3><p data-i18n="p5_p">No fixed schedule. Save monthly, skip a month, or put in a bonus anytime.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></div><div><h3 data-i18n="p6_h">Only 5 years</h3><p data-i18n="p6_p">A short, clear finish line. You know exactly when your money comes back.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></div><div><h3 data-i18n="p7_h">You choose the payout</h3><p data-i18n="p7_p">Keep dividends in to grow faster, or get them every year as extra income.</p></div></div>
+      <div class="perk"><div class="pi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="13" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v11"/></svg></div><div><h3 data-i18n="p8_h">Open more than one</h3><p data-i18n="p8_p">Have separate MP2 accounts for different goals, like tuition, travel, or a house.</p></div></div>
+    </div>
+  </section>
+
+  <section id="basics" class="reveal">
+    <div class="section-head">
+      <h2 data-i18n="b_h">MP2 in 4 simple points</h2>
+      <p data-i18n="b_p">No jargon. Here's all you need to know before using the calculator.</p>
+    </div>
+    <div class="basics">
+      <div class="basic"><div class="step">1</div><h3 data-i18n="b1_h">It's a savings program</h3><p data-i18n="b1_p">MP2 is an optional savings program of Pag-IBIG Fund for members who want to save more.</p></div>
+      <div class="basic"><div class="step">2</div><h3 data-i18n="b2_h">Save as low as ₱500</h3><p data-i18n="b2_p">Every deposit must be at least ₱500. You can save monthly, once in a while, or all at once.</p></div>
+      <div class="basic"><div class="step">3</div><h3 data-i18n="b3_h">Leave it for 5 years</h3><p data-i18n="b3_p">Your money stays in for 5 years. Each year, it earns extra money called a <b>dividend</b>.</p></div>
+      <div class="basic"><div class="step">4</div><h3 data-i18n="b4_h">Get it all back</h3><p data-i18n="b4_p">After 5 years, you get your savings plus the dividends. The dividends are tax-free.</p></div>
+    </div>
+  </section>
+
+  <section id="calculator" class="reveal">
+    <div class="section-head">
+      <h2 data-i18n="c_h">Calculator</h2>
+      <p data-i18n="c_p">Pick the way you save. Your answer updates right away.</p>
+    </div>
+
+    <div class="calc">
+      <div class="card">
+        <div class="tabs" role="tablist" id="modeTabs" data-active="simple">
+          <span class="pill" aria-hidden="true"></span>
+          <button role="tab" id="tab-simple" aria-controls="panel-simple" aria-selected="true" data-mode="simple" data-i18n="tab1">Same amount<small>every month</small></button>
+          <button role="tab" id="tab-custom" aria-controls="panel-custom" aria-selected="false" data-mode="custom" tabindex="-1" data-i18n="tab2">My own amounts<small>fill in a table</small></button>
+        </div>
+
+        <!-- Simple -->
+        <div class="panel" id="panel-simple" role="tabpanel" aria-labelledby="tab-simple">
+          <div class="field">
+            <label for="monthly" data-i18n="s_monthly">How much will you save every month?</label>
+            <div class="money big"><span>₱</span><input id="monthly" inputmode="decimal" autocomplete="off" value="1,000"></div>
+            <div class="chips" id="monthlyChips">
+              <button type="button" class="chip" data-v="500">₱500</button>
+              <button type="button" class="chip" data-v="1000">₱1,000</button>
+              <button type="button" class="chip" data-v="2000">₱2,000</button>
+              <button type="button" class="chip" data-v="5000">₱5,000</button>
+              <button type="button" class="chip" data-v="10000">₱10,000</button>
+            </div>
+            <div class="warn" id="monthlyWarn" hidden data-i18n="s_warn">MP2 needs at least ₱500 per deposit.</div>
+          </div>
+          <div class="field">
+            <label for="lump" data-i18n="s_lump">Any extra amount on day one? <span class="help">Optional. For example, a bonus or 13th month pay you want to put in at the start. Leave as 0 if none.</span></label>
+            <div class="money"><span>₱</span><input id="lump" inputmode="decimal" autocomplete="off" value="0"></div>
+          </div>
+        </div>
+
+        <!-- Custom -->
+        <div class="panel" id="panel-custom" role="tabpanel" aria-labelledby="tab-custom" hidden>
+          <div class="field">
+            <span class="label" data-i18n="u_start">When is your first deposit?</span>
+            <div class="startrow">
+              <select id="startMonth" aria-label="Start month"></select>
+              <select id="startYear" aria-label="Start year"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="label" data-i18n="u_type">Type how much you'll save each month <span class="help">Leave a month blank if you won't save that month. Amounts can be different every month.</span></span>
+            <div class="years" role="tablist" id="yearTabs" aria-label="Year"></div>
+            <div class="months" id="monthGrid"></div>
+            <div class="warn" id="customWarn" hidden></div>
+
+            <div class="tools">
+              <div class="money"><span>₱</span><input id="fillAmt" inputmode="decimal" autocomplete="off" value="1,000" aria-label="Amount to fill"></div>
+              <button type="button" class="sbtn primary" id="fillYear" data-i18n="u_fill">Fill this year</button>
+              <button type="button" class="sbtn" id="copyAll" data-i18n="u_copy">Copy this year to all 5 years</button>
+            </div>
+            <div class="tools">
+              <button type="button" class="sbtn danger" id="clearYear" data-i18n="u_clear">Clear this year</button>
+              <button type="button" class="sbtn danger" id="clearAll" data-i18n="u_clearall">Clear everything</button>
+            </div>
+            <p class="tiny" data-i18n="u_tip">Tip: put your 13th month pay or bonus in December. Bigger deposits earlier mean bigger dividends.</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <p class="shared-title" data-i18n="shared">Settings for both</p>
+
+        <div class="field">
+          <label for="rate" data-i18n="r_lbl">Yearly dividend rate <span class="help">How much MP2 adds each year. It changes yearly. Not sure? Use the latest one.</span></label>
+          <div class="money"><input id="rate" inputmode="decimal" autocomplete="off" value="7.12" style="padding-left:14px"><span class="after" data-i18n="r_after">% per year</span></div>
+          <div class="chips" id="rateChips"></div>
+          <div class="rate-src" id="rateSrc"><i></i><span></span></div>
+        </div>
+
+        <div class="field" style="margin-bottom:0">
+          <span class="label" id="payoutLbl" data-i18n="p_lbl">What happens to your yearly dividend?</span>
+          <div class="choice" role="radiogroup" aria-labelledby="payoutLbl">
+            <label><input type="radio" name="payout" value="compound" checked><span data-i18n="p_keep"><b>Keep it in</b><span>It gets added to your savings and earns more. Bigger total at the end.</span></span></label>
+            <label><input type="radio" name="payout" value="annual"><span data-i18n="p_pay"><b>Get it every year</b><span>It's sent to your bank account each year. Smaller total at the end.</span></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card results" aria-live="polite">
+        <p class="res-label" data-i18n="o_h">After 5 years, you could get</p>
+        <p class="total" id="oTotal">₱0.00</p>
+        <p class="sentence" id="oSentence"></p>
+
+        <div class="split" aria-hidden="true"><i class="a" id="splitA" style="width:0"></i><i class="b" id="splitB" style="width:0"></i></div>
+        <dl class="legend">
+          <div><dt data-i18n="o_saved">Your savings</dt><dd id="oContrib">₱0</dd></div>
+          <div><dt id="oDivLbl"></dt><dd id="oDiv">₱0</dd></div>
+        </dl>
+
+        <p class="res-label" style="margin-bottom:10px" data-i18n="o_chart">Your money, year by year</p>
+        <div class="chart" id="chart"></div>
+        <div class="xlabels" id="xlabels"></div>
+        <p class="chart-note" id="chartNote"></p>
+
+        <details class="breakdown">
+          <summary data-i18n="o_full">See the full numbers</summary>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th data-i18n="th1">Year</th><th data-i18n="th2">You saved</th><th data-i18n="th3">Dividend</th><th id="balHead"></th></tr></thead>
+              <tbody id="tbody"></tbody>
+              <tfoot id="tfoot"></tfoot>
+            </table>
+          </div>
+        </details>
+
+        <div class="res-actions">
+          <button type="button" class="sbtn" id="copyRes"></button>
+        </div>
+        <a class="res-cta" href="#start"><span data-i18n="rc">Like what you see? Here's how to start your MP2.</span><span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="start" class="cta reveal">
+    <div>
+      <h2 data-i18n="cta_h">Your future self will thank you. <em>Start your MP2 today.</em></h2>
+      <p data-i18n="cta_p">Even ₱500 a month adds up. Opening an account is free and can be done online in a few minutes.</p>
+      <div class="btns">
+        <a class="btn" href="https://www.pagibigfund.gov.ph" rel="noopener"><span data-i18n="cta_go">Go to the official Pag-IBIG website</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+        <a class="btn ghost" href="#calculator" data-i18n="cta_again">Try another amount</a>
+      </div>
+      <span class="leave" data-i18n="cta_leave">You'll be taken to Pag-IBIG Fund's own website. This calculator is not part of Pag-IBIG.</span>
+    </div>
+    <ol>
+      <li><div><b data-i18n="cs1_b">Log in to Virtual Pag-IBIG</b><span data-i18n="cs1_s">Use your Pag-IBIG MID number. No account yet? Register there first.</span></div></li>
+      <li><div><b data-i18n="cs2_b">Enroll in MP2</b><span data-i18n="cs2_s">Fill out the short form and you'll get your MP2 account number.</span></div></li>
+      <li><div><b data-i18n="cs3_b">Make your first deposit</b><span data-i18n="cs3_s">At least ₱500, online or at any Pag-IBIG branch. That's it, you're saving.</span></div></li>
+    </ol>
+  </section>
+
+  <section id="faq" class="reveal">
+    <div class="section-head">
+      <h2 data-i18n="f_h">Common questions</h2>
+      <p data-i18n="f_p">Short answers for first-time savers.</p>
+    </div>
+    <div class="faq">
+      <p class="faq-group" data-i18n="fg1">The basics</p>
+      <details><summary data-i18n="q1">What is MP2, in simple words?</summary><div class="ans" data-i18n="a1"><p>MP2 (Modified Pag-IBIG 2) is a voluntary savings program of Pag-IBIG Fund. You put money in, leave it for 5 years, and it earns extra money every year. It's separate from the regular Pag-IBIG contribution that's deducted from your salary.</p></div></details>
+      <details><summary data-i18n="q2">What is a "dividend"?</summary><div class="ans" data-i18n="a2"><p>It's the extra money MP2 adds to your savings every year. Think of it like interest in a bank, but usually much higher. At 7.12%, ₱10,000 saved for a full year earns about ₱712.</p></div></details>
+      <details><summary data-i18n="q3">How is MP2 different from my regular Pag-IBIG savings?</summary><div class="ans" data-i18n="a3"><p>Your <b>regular Pag-IBIG savings</b> (also called Pag-IBIG I or P1) is required and usually deducted from your salary.</p><p><b>MP2</b> is optional, you choose how much and when to save, it matures in 5 years, and its dividend rate is set higher than the regular savings rate.</p></div></details>
+      <details><summary data-i18n="q4">Who can open an MP2 account?</summary><div class="ans" data-i18n="a4"><ul><li>Active Pag-IBIG members, regardless of income</li><li>Former members who are pensioners or have other monthly income, if they had at least 24 monthly savings before retiring</li><li>Former natural-born Filipinos who got their citizenship back under R.A. 9225</li></ul></div></details>
+      <details><summary data-i18n="q5">Is my money safe in MP2?</summary><div class="ans" data-i18n="a5"><p>MP2 is run by Pag-IBIG Fund, a government agency, and its savings are guaranteed by the national government. Like any savings decision, read the official terms before putting in money.</p></div></details>
+      <details><summary data-i18n="q6">Do I pay tax on MP2 dividends?</summary><div class="ans" data-i18n="a6"><p>No. MP2 dividends are tax-free, so the amount you see in this calculator is not reduced by tax.</p></div></details>
+
+      <p class="faq-group" data-i18n="fg2">Saving</p>
+      <details><summary data-i18n="q7">What's the minimum and maximum I can save?</summary><div class="ans" data-i18n="a7"><p>The minimum is ₱500 per deposit. There's no set maximum. For big amounts: payments above ₱100,000 need proof of income or source of funds, and one-time payments above ₱500,000 must be paid by personal or manager's check.</p></div></details>
+      <details><summary data-i18n="q8">Do I have to save every single month?</summary><div class="ans" data-i18n="a8"><p>No. You can skip months, change the amount anytime, or deposit just once. Use the <b>"My own amounts"</b> tab above to see what happens when your deposits are different each month.</p></div></details>
+      <details><summary data-i18n="q9">Is it better to put in one big amount or save monthly?</summary><div class="ans" data-i18n="a9"><p>Money that goes in earlier earns dividends longer, so a big deposit at the start usually earns more than the same amount spread over 5 years. But saving monthly is easier for most people. Try both in the calculator and compare.</p></div></details>
+      <details><summary data-i18n="q10">How do I open an account and pay?</summary><div class="ans" data-i18n="a10"><p>You can enroll online through Virtual Pag-IBIG on the Pag-IBIG Fund website, or at any Pag-IBIG branch. After you get your MP2 account number, you can pay through Virtual Pag-IBIG, accredited payment partners, or at a branch. Always check the official list of payment channels.</p></div></details>
+      <details><summary data-i18n="q11">Can I have more than one MP2 account?</summary><div class="ans" data-i18n="a11"><p>Yes, many members open several MP2 accounts, for example one for each goal or one started each year. Each account has its own 5-year term.</p></div></details>
+
+      <p class="faq-group" data-i18n="fg3">Dividends</p>
+      <details><summary data-i18n="q12">Is the dividend rate guaranteed every year?</summary><div class="ans" data-i18n="a12"><p>No. Pag-IBIG Fund announces a new rate every year, usually around February or March, based on how much it earned. If you want a safer estimate, tap the <b>"Cautious"</b> button.</p></div></details>
+      <details><summary data-i18n="q13">Should I keep the dividend in, or get it every year?</summary><div class="ans" data-i18n="a13"><p><b>Keep it in</b> if you don't need the money yet. Your dividends also earn dividends, so you end up with more.</p><p><b>Get it every year</b> if you want a yearly "allowance" from your savings. Your final total is smaller, but you receive some money along the way.</p></div></details>
+      <details><summary data-i18n="q14">Why is my result slightly different from Pag-IBIG's?</summary><div class="ans" data-i18n="a14"><p>This calculator assumes you deposit at the start of each month. Pag-IBIG computes using your actual posting dates, so real amounts will be a little different. Use this as a guide, not an exact figure.</p></div></details>
+
+      <p class="faq-group" data-i18n="fg4">Withdrawing</p>
+      <details><summary data-i18n="q15">Can I withdraw before 5 years?</summary><div class="ans" data-i18n="a15"><p>Yes, but only for certain reasons, and you get your full dividends only for these reasons:</p><ul><li>Total disability or insanity</li><li>Death of the member or an immediate family member</li><li>Permanently leaving the country</li><li>Critical illness of the member or an immediate family member</li><li>Other reasons approved by Pag-IBIG's Board</li></ul><p>For any other reason, you only get <b>50% of the dividends</b> earned.</p></div></details>
+      <details><summary data-i18n="q16">What happens when my 5 years are up?</summary><div class="ans" data-i18n="a16"><p>You can claim your savings and dividends. If you want to keep saving, open a new MP2 account. If you don't claim it, your money stops earning MP2 dividends. For the next 2 years it earns only the lower regular Pag-IBIG rate.</p></div></details>
+      <details><summary data-i18n="q17">Is this website from Pag-IBIG?</summary><div class="ans" data-i18n="a17"><p>No. This is an independent calculator and is not associated with Pag-IBIG Fund. For official answers, contact Pag-IBIG Fund directly or visit their website.</p></div></details>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="ft1">This is an estimate. MP2 dividends are not fixed; Pag-IBIG Fund declares the rate each year based on its earnings. Past rates do not guarantee future ones.</p>
+    <p data-i18n="ft2">How it's computed: deposits are assumed at the start of each month, and each year's dividend is the rate applied to the average monthly balance, the same idea Pag-IBIG uses with average daily balances. Actual figures will differ slightly depending on posting dates. Minimum MP2 remittance is ₱500.</p>
+    <p data-i18n="ft3">This website is an independent tool and is not associated with Pag-IBIG Fund (HDMF).</p>
+    <p class="privacy">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <span data-i18n="ft4">Nothing you type here is saved or sent anywhere. All math runs in your browser and disappears when you close the page. The only things recorded are page views and likes (counted with an anonymous ID), and feedback you choose to send. Calculator inputs are never recorded.</span>
+    </p>
+    <div class="stats" id="stats" aria-live="polite" hidden>
+      <div class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><b id="stViews">—</b><span data-i18n="st_views">views</span></div>
+      <div class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><b id="stLikes">—</b><span data-i18n="st_likes">likes</span></div>
+    </div>
+    <details class="changelog">
+      <summary><span class="ver"><code id="verTag">v1.0</code> <span data-i18n="v_whats">What's in this version</span></span></summary>
+      <div data-i18n="v_log"><ul><li><b>v1.0</b> (November 2026): first release. MP2 perks, same-amount and custom monthly calculators, how-to-start guide, English and Tagalog, FAQs, likes, views and feedback.</li></ul></div>
+    </details>
+    <div class="copyright">
+      <span>© <span id="cyear">2026</span> MP2 Calculator · <span id="verTag2">v1.0</span>. <span data-i18n="ft_rights">All rights reserved.</span></span>
+      <span data-i18n="ft_tm">Pag-IBIG Fund and MP2 are names of the Home Development Mutual Fund, used here only for reference.</span>
+    </div>
+  </footer>
+</div>
+
+<div class="fab">
+<button type="button" class="fbtn" id="fbBtn" aria-haspopup="dialog">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="lbl" data-i18n="fb_lbl">Feedback</span>
+</button>
+<button type="button" class="like" id="likeBtn" aria-pressed="false" aria-label="Like this calculator">
+  <span class="burst" aria-hidden="true"><i style="--a:0deg"></i><i style="--a:60deg"></i><i style="--a:120deg"></i><i style="--a:180deg"></i><i style="--a:240deg"></i><i style="--a:300deg"></i></span>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="heart" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+  <span class="lc" id="likeCount" hidden>0</span>
+  <span class="lbl" data-i18n="like_lbl">Like</span>
+</button>
+</div>
+
+<div class="modal" id="fbModal" role="dialog" aria-modal="true" aria-labelledby="fbTitle" hidden>
+  <div class="sheet">
+    <form id="fbForm" novalidate>
+      <h3 id="fbTitle" data-i18n="fm_h">Send feedback</h3>
+      <p data-i18n="fm_p">Found a bug, have an idea, or a question? Tell us. It takes 30 seconds.</p>
+      <div class="field"><label for="fbName"><span data-i18n="fm_name">Name</span> <span class="opt" data-i18n="fm_opt">(optional)</span></label><input type="text" id="fbName" maxlength="80" autocomplete="name"></div>
+      <div class="field"><label for="fbEmail"><span data-i18n="fm_email">Email</span> <span class="opt" data-i18n="fm_opt2">(optional, if you want a reply)</span></label><input type="email" id="fbEmail" maxlength="120" autocomplete="email"></div>
+      <div class="field"><label for="fbComment" data-i18n="fm_comment">Your comment</label><textarea id="fbComment" maxlength="2000" required></textarea><div class="warn" id="fbWarn" hidden></div></div>
+      <div class="row-btns">
+        <button type="button" class="sbtn" data-close data-i18n="fm_cancel">Cancel</button>
+        <button type="submit" class="sbtn primary" id="fbSend" data-i18n="fm_send">Send feedback</button>
+      </div>
+      <p class="note" data-i18n="fm_note">Only the site owner can read feedback. Don't include passwords, MID numbers, or other private details.</p>
+    </form>
+    <div class="done" id="fbDone" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path class="ck" d="M7.5 12.5l3 3 6-6.5"/></svg>
+      <h3 id="fbDoneH"></h3>
+      <p id="fbDoneP" style="color:var(--muted);margin:6px 0 16px"></p>
+      <div class="row-btns" style="justify-content:center">
+        <button type="button" class="sbtn" id="fbCopy" data-i18n="fm_dl">Save a copy (.txt)</button>
+        <button type="button" class="sbtn primary" data-close data-i18n="fm_close">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="like-tip" id="likeTip" role="status" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  var APP_VERSION = "1.0";
+  /* Views and likes stay hidden until the page reaches this many views. */
+  var STATS_MIN_VIEWS = 50;
+  var TERM = 5, MONTHS = TERM * 12, MIN = 500;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $ = function (id) { return document.getElementById(id); };
+  var peso = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var pesoShort = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 });
+  var plain = new Intl.NumberFormat("en-PH", { maximumFractionDigits: 2 });
+
+  /* Built-in backup rates, used only if rates.txt can't be read. */
+  var FALLBACK_RATES = { 2020: 6.12, 2021: 6.00, 2022: 7.03, 2023: 7.05, 2024: 7.10, 2025: 7.12 };
+
+  /* ================= Language ================= */
+  var TL = {
+    disc_t: "Hindi opisyal na calculator",
+    disc_b: "Ang website na ito ay <u>hindi</u> konektado, inendorso, o pinapatakbo ng Pag-IBIG Fund (HDMF). Pagtatantya lang ang ibinibigay nito. Para sa opisyal na impormasyon, bisitahin ang",
+    brand_sub: "Hindi opisyal na pantantya ng ipon",
+    nav1: "Paano gumagana ang MP2", nav2: "Calculator", nav3: "Mga tanong",
+    eyebrow: "Libre · Walang sign-up · Pribado ang mga numero mo",
+    h1: "Tingnan kung paano <em>lalago ang MP2 mo sa 5 taon.</em>",
+    lead: "I-type kung magkano ang balak mong ipunin. Ipapakita namin kung magkano ang posibleng makuha mo, sa simpleng salita.",
+    cta1: "Simulan ang pag-compute", cta2: "Ano ang MP2?",
+    pk_h: "Bakit mag-ipon sa MP2?", pk_p: "Ang mga benepisyong dahilan kung bakit isa ang MP2 sa pinakasikat na paraan ng mga Pilipino para palaguin ang ipon.",
+    nav0: "Mga benepisyo",
+    p1_h: "Mas malaking kita", p1_p: "Mas mataas ang dividend kaysa sa regular na Pag-IBIG savings. Nasa 7% kada taon ang mga nakaraang rate.",
+    p2_h: "Walang tax", p2_p: "Sa iyo ang bawat pisong dividend. Walang tax na kinakaltas sa idinadagdag ng MP2.",
+    p3_h: "Garantisado ng gobyerno", p3_p: "Ang ipon mo ay garantisado ng national government sa pamamagitan ng Pag-IBIG Fund.",
+    p4_h: "Simula sa ₱500", p4_p: "Hindi kailangan ng malaking halaga. Sapat na ang ₱500 para sa unang hulog.",
+    p5_h: "Ikaw ang bahala", p5_p: "Walang fixed na schedule. Maghulog buwan-buwan, lumaktaw ng buwan, o ihulog ang bonus kahit kailan.",
+    p6_h: "5 taon lang", p6_p: "Malinaw at maikli ang hintay. Alam mo kung kailan babalik ang pera mo.",
+    p7_h: "Ikaw ang pipili ng payout", p7_p: "Iwan ang dividends para mas mabilis lumago, o kunin taon-taon bilang dagdag na kita.",
+    p8_h: "Puwedeng higit sa isa", p8_p: "Magbukas ng hiwalay na MP2 account para sa iba-ibang goal, gaya ng tuition, travel, o bahay.",
+    b_h: "Ang MP2 sa 4 na simpleng punto", b_p: "Walang komplikadong salita. Ito lang ang kailangan mong malaman bago gamitin ang calculator.",
+    b1_h: "Isa itong savings program", b1_p: "Ang MP2 ay boluntaryong ipunan ng Pag-IBIG Fund para sa mga miyembrong gustong mag-ipon pa nang mas malaki.",
+    b2_h: "Kahit ₱500 lang", b2_p: "Bawat hulog ay dapat hindi bababa sa ₱500. Puwede kang maghulog buwan-buwan, paminsan-minsan, o isang bagsakan.",
+    b3_h: "Iwan nang 5 taon", b3_p: "Mananatili ang pera mo nang 5 taon. Taon-taon, may dagdag itong kita na tinatawag na <b>dividend</b>.",
+    b4_h: "Makukuha mo lahat", b4_p: "Pagkalipas ng 5 taon, makukuha mo ang ipon mo kasama ang dividends. Walang tax ang dividends.",
+    c_h: "Calculator", c_p: "Piliin kung paano ka mag-iipon. Agad na lalabas ang sagot.",
+    tab1: "Parehong halaga<small>bawat buwan</small>", tab2: "Sariling halaga<small>punan ang table</small>",
+    s_monthly: "Magkano ang ipupunin mo bawat buwan?",
+    s_warn: "Kailangan ng MP2 ng hindi bababa sa ₱500 bawat hulog.",
+    s_lump: "May dagdag ka bang ihuhulog sa simula? <span class=\"help\">Opsyonal. Halimbawa, bonus o 13th month pay na gusto mong ihulog agad. Iwanang 0 kung wala.</span>",
+    u_start: "Kailan ang unang hulog mo?",
+    u_type: "I-type kung magkano ang ihuhulog mo bawat buwan <span class=\"help\">Iwanang blangko ang buwan na hindi ka maghuhulog. Puwedeng magkakaiba ang halaga bawat buwan.</span>",
+    u_fill: "Punan ang taong ito", u_copy: "Kopyahin sa lahat ng 5 taon",
+    u_clear: "Burahin ang taong ito", u_clearall: "Burahin lahat",
+    u_tip: "Tip: ihulog ang 13th month pay o bonus tuwing Disyembre. Mas maaga at mas malaki ang hulog, mas malaki ang dividend.",
+    shared: "Settings para sa dalawa",
+    r_lbl: "Dividend rate kada taon <span class=\"help\">Ito ang idinadagdag ng MP2 bawat taon. Nagbabago ito taon-taon. Hindi sigurado? Gamitin ang pinakabago.</span>",
+    r_after: "% kada taon",
+    p_lbl: "Ano ang gagawin sa dividend mo bawat taon?",
+    p_keep: "<b>Iwan sa account</b><span>Idadagdag ito sa ipon mo at kikita pa. Mas malaki ang total sa dulo.</span>",
+    p_pay: "<b>Kunin taon-taon</b><span>Ipapadala ito sa bank account mo bawat taon. Mas maliit ang total sa dulo.</span>",
+    o_h: "Pagkalipas ng 5 taon, posibleng makuha mo",
+    o_saved: "Ipon mo", o_chart: "Ang pera mo, taon-taon", o_full: "Tingnan ang buong detalye",
+    th1: "Taon", th2: "Inipon mo", th3: "Dividend",
+    f_h: "Mga madalas itanong", f_p: "Maiikling sagot para sa mga first-time saver.",
+    fg1: "Ang mga basic", fg2: "Pag-iipon", fg3: "Dividends", fg4: "Pag-withdraw",
+    q1: "Ano ang MP2, sa simpleng salita?",
+    a1: "<p>Ang MP2 (Modified Pag-IBIG 2) ay boluntaryong savings program ng Pag-IBIG Fund. Maghuhulog ka, iiwan mo nang 5 taon, at kikita ito ng dagdag bawat taon. Iba ito sa regular na Pag-IBIG contribution na kinakaltas sa sweldo mo.</p>",
+    q2: "Ano ang \"dividend\"?",
+    a2: "<p>Ito ang dagdag na pera na idinadagdag ng MP2 sa ipon mo bawat taon. Parang interest sa bangko, pero kadalasan mas mataas. Sa 7.12%, ang ₱10,000 na naipon nang buong taon ay kikita ng mga ₱712.</p>",
+    q3: "Ano ang pinagkaiba ng MP2 sa regular kong Pag-IBIG savings?",
+    a3: "<p>Ang <b>regular Pag-IBIG savings</b> (tinatawag ding Pag-IBIG I o P1) ay required at kadalasang kinakaltas sa sweldo.</p><p>Ang <b>MP2</b> ay opsyonal. Ikaw ang bahala kung magkano at kailan maghuhulog, nagma-mature ito sa 5 taon, at mas mataas ang dividend rate nito kaysa sa regular savings.</p>",
+    q4: "Sino ang puwedeng magbukas ng MP2?",
+    a4: "<ul><li>Mga aktibong miyembro ng Pag-IBIG, anuman ang sweldo</li><li>Mga dating miyembro na pensioner o may ibang buwanang kita, basta may hindi bababa sa 24 na buwanang hulog bago mag-retire</li><li>Mga dating natural-born Filipino na nabawi ang citizenship sa ilalim ng R.A. 9225</li></ul>",
+    q5: "Ligtas ba ang pera ko sa MP2?",
+    a5: "<p>Ang MP2 ay pinapatakbo ng Pag-IBIG Fund, isang ahensya ng gobyerno, at ang ipon dito ay garantisado ng national government. Gaya ng ibang desisyon sa pera, basahin muna ang opisyal na terms bago maghulog.</p>",
+    q6: "May tax ba ang MP2 dividends?",
+    a6: "<p>Wala. Tax-free ang MP2 dividends, kaya hindi nababawasan ng tax ang halagang nakikita mo sa calculator na ito.</p>",
+    q7: "Magkano ang pinakamababa at pinakamataas na puwedeng ihulog?",
+    a7: "<p>Ang pinakamababa ay ₱500 bawat hulog. Walang nakatakdang maximum. Para sa malalaking halaga: ang hulog na lampas ₱100,000 ay kailangan ng proof of income o source of funds, at ang isang bagsakang hulog na lampas ₱500,000 ay dapat bayaran gamit ang personal o manager's check.</p>",
+    q8: "Kailangan ko bang maghulog buwan-buwan?",
+    a8: "<p>Hindi. Puwede kang lumaktaw ng buwan, magpalit ng halaga kahit kailan, o isang beses lang maghulog. Gamitin ang <b>\"Sariling halaga\"</b> tab sa itaas para makita ang resulta kapag magkakaiba ang hulog mo bawat buwan.</p>",
+    q9: "Mas maganda ba ang isang bagsakan o buwanang hulog?",
+    a9: "<p>Mas matagal kumikita ang perang naihulog nang mas maaga, kaya kadalasan mas malaki ang kita ng isang malaking hulog sa simula kaysa sa parehong halaga na hinati sa 5 taon. Pero mas madali para sa karamihan ang buwanang hulog. Subukan ang dalawa sa calculator at ikumpara.</p>",
+    q10: "Paano magbukas ng account at magbayad?",
+    a10: "<p>Puwede kang mag-enroll online sa Virtual Pag-IBIG sa website ng Pag-IBIG Fund, o sa kahit anong Pag-IBIG branch. Kapag may MP2 account number ka na, puwede kang magbayad sa Virtual Pag-IBIG, sa mga accredited payment partner, o sa branch. Laging i-check ang opisyal na listahan ng payment channels.</p>",
+    q11: "Puwede ba akong magkaroon ng higit sa isang MP2 account?",
+    a11: "<p>Oo, maraming miyembro ang may ilang MP2 account, halimbawa isa para sa bawat goal o isa bawat taon. May sariling 5-taong term ang bawat account.</p>",
+    q12: "Garantisado ba ang dividend rate bawat taon?",
+    a12: "<p>Hindi. Nag-aanunsyo ang Pag-IBIG Fund ng bagong rate bawat taon, kadalasan bandang Pebrero o Marso, depende sa kinita nito. Kung gusto mo ng mas ligtas na tantya, pindutin ang <b>\"Maingat\"</b> na button.</p>",
+    q13: "Iiwan ko ba ang dividend o kukunin taon-taon?",
+    a13: "<p><b>Iwan sa account</b> kung hindi mo pa kailangan ang pera. Kumikita rin ang dividends mo, kaya mas malaki ang makukuha mo.</p><p><b>Kunin taon-taon</b> kung gusto mo ng taunang \"allowance\" mula sa ipon mo. Mas maliit ang huling total, pero may natatanggap ka habang naghihintay.</p>",
+    q14: "Bakit medyo iba ang resulta ko sa Pag-IBIG?",
+    a14: "<p>Ina-assume ng calculator na ito na naghuhulog ka sa simula ng bawat buwan. Ang Pag-IBIG ay nagko-compute gamit ang aktwal na petsa ng pagpasok ng hulog, kaya medyo iba ang totoong halaga. Gamitin ito bilang gabay, hindi eksaktong halaga.</p>",
+    q15: "Puwede bang mag-withdraw bago ang 5 taon?",
+    a15: "<p>Oo, pero buong dividends lang ang makukuha mo kung dahil sa mga ito:</p><ul><li>Total disability o insanity</li><li>Pagkamatay ng miyembro o ng immediate family member</li><li>Permanenteng pag-alis ng bansa</li><li>Critical illness ng miyembro o ng immediate family member</li><li>Ibang dahilan na aprubado ng Board ng Pag-IBIG</li></ul><p>Kung ibang dahilan, <b>50% lang ng dividends</b> ang makukuha mo.</p>",
+    q16: "Ano ang mangyayari pagkatapos ng 5 taon?",
+    a16: "<p>Puwede mo nang i-claim ang ipon at dividends mo. Kung gusto mo pang mag-ipon, magbukas ng bagong MP2 account. Kung hindi mo ike-claim, titigil itong kumita ng MP2 dividends. Sa susunod na 2 taon, ang mas mababang regular Pag-IBIG rate na lang ang kikitain nito.</p>",
+    q17: "Galing ba sa Pag-IBIG ang website na ito?",
+    a17: "<p>Hindi. Independent na calculator ito at hindi konektado sa Pag-IBIG Fund. Para sa opisyal na sagot, makipag-ugnayan sa Pag-IBIG Fund o bisitahin ang kanilang website.</p>",
+    ft1: "Pagtatantya lang ito. Hindi fixed ang MP2 dividends; ang Pag-IBIG Fund ang nagdedeklara ng rate bawat taon base sa kinita nito. Hindi garantiya ng mga lumang rate ang mga susunod.",
+    ft2: "Paano kinompute: ina-assume na naghuhulog sa simula ng bawat buwan, at ang dividend bawat taon ay ang rate na inilapat sa average na buwanang balanse, katulad ng paraan ng Pag-IBIG na gumagamit ng average daily balance. Medyo mag-iiba ang aktwal na halaga depende sa petsa ng pagpasok ng hulog. ₱500 ang pinakamababang hulog sa MP2.",
+    ft3: "Ang website na ito ay independent na tool at hindi konektado sa Pag-IBIG Fund (HDMF).",
+    ft4: "Walang sine-save o ipinapadala kahit saan sa mga tina-type mo rito. Sa browser mo lang ginagawa ang lahat ng compute, at nawawala ito pagsara mo ng page. Ang tanging nire-record ay ang bilang ng views at likes, gamit ang anonymous ID (walang pangalan, walang email, walang input sa calculator).",
+    st_views: "views",
+    rc: "Gusto mo ang resulta? Ganito magsimula ng MP2.",
+    cta_h: "Pasasalamatan ka ng future self mo. <em>Simulan ang MP2 mo ngayon.</em>",
+    cta_p: "Kahit ₱500 kada buwan, lumalaki. Libre ang pagbukas ng account at puwedeng gawin online sa loob ng ilang minuto.",
+    cta_go: "Pumunta sa opisyal na website ng Pag-IBIG", cta_again: "Subukan ang ibang halaga",
+    cta_leave: "Dadalhin ka sa sariling website ng Pag-IBIG Fund. Hindi bahagi ng Pag-IBIG ang calculator na ito.",
+    cs1_b: "Mag-log in sa Virtual Pag-IBIG", cs1_s: "Gamitin ang Pag-IBIG MID number mo. Wala pang account? Mag-register muna doon.",
+    cs2_b: "Mag-enroll sa MP2", cs2_s: "Sagutan ang maikling form at makukuha mo ang MP2 account number mo.",
+    cs3_b: "Ihulog ang unang deposit", cs3_s: "Hindi bababa sa ₱500, online o sa kahit anong Pag-IBIG branch. Ayan, nag-iipon ka na.",
+    fb_lbl: "Feedback",
+    fm_h: "Magpadala ng feedback", fm_p: "May nakitang mali, may idea, o may tanong? Sabihin mo sa amin. 30 segundo lang.",
+    fm_name: "Pangalan", fm_opt: "(opsyonal)", fm_email: "Email", fm_opt2: "(opsyonal, kung gusto mo ng sagot)",
+    fm_comment: "Ang komento mo", fm_cancel: "Kanselahin", fm_send: "Ipadala",
+    fm_note: "Ang may-ari lang ng site ang makakabasa ng feedback. Huwag isama ang password, MID number, o iba pang pribadong detalye.",
+    fm_dl: "Mag-save ng kopya (.txt)", fm_close: "Isara", st_likes: "likes",
+    v_whats: "Ano ang laman ng bersyong ito",
+    v_log: "<ul><li><b>v1.0</b> (Nobyembre 2026): unang release. Mga benepisyo ng MP2, calculator para sa parehong halaga at sariling buwanang hulog, gabay sa pagsisimula, English at Tagalog, FAQs, likes, views at feedback.</li></ul>",
+    like_lbl: "Like",
+    ft_rights: "Lahat ng karapatan ay nakalaan.",
+    ft_tm: "Ang Pag-IBIG Fund at MP2 ay pangalan ng Home Development Mutual Fund, ginamit dito para sa reference lamang."
+  };
+
+  var T = {
+    en: {
+      months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      monthsFull: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      year: "Year", yr: "Yr", total: "Total", empty: "empty", blank: "blank",
+      divKeep: "MP2 added (dividends)", divPay: "Dividends you received",
+      balKeep: "Total so far", balPay: "Savings so far",
+      chartKeep: "Green is what you saved. Gold is what MP2 added.",
+      chartPay: "Green is what you saved. Gold is the dividends you received so far.",
+      enter: "Enter an amount to see your estimate.",
+      sKeep: function (c, d, g) { return "You save <b>" + c + "</b>, and MP2 adds about <b>" + d + "</b> on top. That's <b>" + g + "% more</b> than what you put in."; },
+      sPay: function (c, d) { return "You get back your <b>" + c + "</b> savings at the end, plus about <b>" + d + "</b> in yearly dividends along the way."; },
+      low: function (n) { return n + (n === 1 ? " month is" : " months are") + " below ₱500, the minimum MP2 deposit. They're highlighted in red."; },
+      latest: "Latest", cautious: "Cautious",
+      srcOk: function (r, y) { return "Latest declared rate: " + r + "% for " + y; },
+      srcOff: function (r, y) { return "Using saved rate: " + r + "% for " + y; },
+      copy: "Copy my results", copied: "Copied!", copyFail: "Couldn't copy",
+      likeOff: "Likes and views are counted only when this page is opened on claude.ai by a signed-in viewer who has access.", likeErr: "Your like couldn't be saved. Your access to this page may be view-only.", liked: "Thanks for the like!",
+      fbNeed: "Please write a comment first.", fbBadEmail: "That email doesn't look right.",
+      fbSentH: "Thank you!", fbSentP: "Your feedback was sent to the site owner.",
+      fbLocalH: "Almost there", fbLocalP: "Feedback can't be sent from this view. Save it as a text file and share it with the site owner.",
+      fbErr: "Couldn't send. Please try again.", fbSending: "Sending…", saved: "Saved", noFb: "No feedback yet.",
+      fbFile: { title: "MP2 Calculator feedback", name: "Name", email: "Email", comment: "Comment", date: "Date", none: "(none)" },
+      cTitle: "My MP2 estimate (unofficial)", cRate: "Dividend rate used", cPer: "per year",
+      cMode: "Dividend", cKeep: "kept in (compounded)", cPay: "paid out yearly",
+      cSaved: "Total savings", cDiv: "Total dividends", cAfter: "After 5 years", cYby: "Year by year",
+      cRow: function (y, c, d, b) { return "Year " + y + ": saved " + c + ", dividend " + d + ", total " + b; }
+    },
+    tl: {
+      months: ["Ene","Peb","Mar","Abr","May","Hun","Hul","Ago","Set","Okt","Nob","Dis"],
+      monthsFull: ["Enero","Pebrero","Marso","Abril","Mayo","Hunyo","Hulyo","Agosto","Setyembre","Oktubre","Nobyembre","Disyembre"],
+      year: "Taon", yr: "Taon", total: "Kabuuan", empty: "wala pa", blank: "wala",
+      divKeep: "Dagdag ng MP2 (dividends)", divPay: "Dividends na natanggap mo",
+      balKeep: "Kabuuan sa ngayon", balPay: "Ipon sa ngayon",
+      chartKeep: "Berde ang inipon mo. Ginto ang idinagdag ng MP2.",
+      chartPay: "Berde ang inipon mo. Ginto ang dividends na natanggap mo na.",
+      enter: "Maglagay ng halaga para makita ang tantya.",
+      sKeep: function (c, d, g) { return "Mag-iipon ka ng <b>" + c + "</b>, at magdadagdag ang MP2 ng mga <b>" + d + "</b>. Ibig sabihin, <b>" + g + "% mas malaki</b> kaysa sa inilagay mo."; },
+      sPay: function (c, d) { return "Makukuha mo ang <b>" + c + "</b> na ipon mo sa dulo, kasama ang mga <b>" + d + "</b> na dividends na natanggap mo taon-taon."; },
+      low: function (n) { return n + " buwan ang mas mababa sa ₱500, ang pinakamababang hulog sa MP2. Naka-pula ang mga ito."; },
+      latest: "Pinakabago", cautious: "Maingat",
+      srcOk: function (r, y) { return "Pinakabagong rate: " + r + "% para sa " + y; },
+      srcOff: function (r, y) { return "Naka-save na rate: " + r + "% para sa " + y; },
+      copy: "Kopyahin ang resulta", copied: "Nakopya na!", copyFail: "Hindi nakopya",
+      likeOff: "Nabibilang lang ang likes at views kapag binuksan ang page na ito sa claude.ai ng naka-sign in na may access.", likeErr: "Hindi na-save ang like mo. Baka view-only ang access mo sa page na ito.", liked: "Salamat sa like!",
+      fbNeed: "Pakisulat muna ang komento mo.", fbBadEmail: "Mukhang mali ang email.",
+      fbSentH: "Salamat!", fbSentP: "Naipadala na ang feedback mo sa may-ari ng site.",
+      fbLocalH: "Konti na lang", fbLocalP: "Hindi maipadala ang feedback mula rito. I-save ito bilang text file at ibigay sa may-ari ng site.",
+      fbErr: "Hindi naipadala. Pakisubukan ulit.", fbSending: "Ipinapadala…", saved: "Na-save na", noFb: "Wala pang feedback.",
+      fbFile: { title: "MP2 Calculator feedback", name: "Pangalan", email: "Email", comment: "Komento", date: "Petsa", none: "(wala)" },
+      cTitle: "Ang tantya ng MP2 ko (hindi opisyal)", cRate: "Dividend rate na ginamit", cPer: "kada taon",
+      cMode: "Dividend", cKeep: "iniwan sa account (compounded)", cPay: "kinukuha taon-taon",
+      cSaved: "Kabuuang ipon", cDiv: "Kabuuang dividends", cAfter: "Pagkalipas ng 5 taon", cYby: "Taon-taon",
+      cRow: function (y, c, d, b) { return "Taon " + y + ": inipon " + c + ", dividend " + d + ", kabuuan " + b; }
+    }
+  };
+
+  var lang = "en", EN = {};
+  document.querySelectorAll("[data-i18n]").forEach(function (el) { EN[el.dataset.i18n] = el.innerHTML; });
+  function t(k) { return T[lang][k]; }
+
+  function setLang(l, animate) {
+    lang = l;
+    document.documentElement.lang = l === "tl" ? "tl" : "en";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.dataset.i18n, v = l === "tl" ? TL[k] : EN[k];
+      if (v != null) el.innerHTML = v;
+    });
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.lang === l); });
+    if (animate && !reduce) { document.body.classList.remove("switching"); void document.body.offsetWidth; document.body.classList.add("switching"); }
+    fillStartMonths();
+    $("xlabels").innerHTML = [1,2,3,4,5].map(function (n) { return "<span>" + t("yr") + " " + n + "</span>"; }).join("");
+    $("copyRes").textContent = t("copy");
+    buildRateChips();
+    if (state.mode === "custom") buildGrid();
+    render();
+  }
+  document.querySelector(".lang").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (b && b.dataset.lang !== lang) setLang(b.dataset.lang, true);
+  });
+
+  /* ================= State & helpers ================= */
+  var state = { mode: "simple", year: 0, custom: new Array(MONTHS).fill(0) };
+  var rates = { list: toList(FALLBACK_RATES), live: false };
+  var rateTouched = false;
+
+  function parse(v) {
+    var n = parseFloat(String(v).replace(/[^0-9.]/g, ""));
+    return isFinite(n) && n > 0 ? n : 0;
+  }
+  function compact(n) {
+    if (n >= 1e6) return "₱" + plain.format(Math.round(n / 1e4) / 100) + "M";
+    if (n >= 1e3) return "₱" + plain.format(Math.round(n / 100) / 10) + "k";
+    return pesoShort.format(n);
+  }
+  function toList(obj) {
+    return Object.keys(obj).map(function (y) { return { y: +y, r: +obj[y] }; })
+      .filter(function (o) { return o.y > 1900 && o.r > 0 && o.r < 100; })
+      .sort(function (a, b) { return a.y - b.y; });
+  }
+
+  /* ================= Rates file ================= */
+  function parseRates(text) {
+    var out = {};
+    text.split(/\r?\n/).forEach(function (line) {
+      line = line.trim();
+      if (!line || line.charAt(0) === "#") return;
+      var m = line.match(/^(\d{4})\s*[=:]\s*([0-9]+(?:\.[0-9]+)?)\s*%?\s*$/);
+      if (m) out[m[1]] = parseFloat(m[2]);
+    });
+    return toList(out);
+  }
+  function latest() { return rates.list[rates.list.length - 1]; }
+
+  function buildRateChips() {
+    var L = rates.list, n = L.length, html = "";
+    if (!n) return;
+    html += '<button type="button" class="chip" data-v="' + L[n - 1].r + '">' + t("latest") + " (" + L[n - 1].y + ") · " + L[n - 1].r.toFixed(2) + "%</button>";
+    for (var i = n - 2; i >= Math.max(0, n - 3); i--) {
+      html += '<button type="button" class="chip" data-v="' + L[i].r + '">' + L[i].y + " · " + L[i].r.toFixed(2) + "%</button>";
+    }
+    var last5 = L.slice(-5).map(function (o) { return o.r; });
+    var low = Math.min.apply(null, last5);
+    html += '<button type="button" class="chip" data-v="' + low + '">' + t("cautious") + " · " + low.toFixed(2) + "%</button>";
+    $("rateChips").innerHTML = html;
+    var lt = latest(), src = $("rateSrc");
+    src.classList.toggle("off", !rates.live);
+    src.querySelector("span").textContent = (rates.live ? t("srcOk") : t("srcOff"))(lt.r.toFixed(2), lt.y);
+    syncChips("rateChips", parse($("rate").value));
+  }
+
+  function loadRates() {
+    if (!window.fetch) return;
+    fetch("rates.txt?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+      .then(function (txt) {
+        var list = parseRates(txt);
+        if (!list.length) return;
+        rates.list = list; rates.live = true;
+        if (!rateTouched) $("rate").value = latest().r.toFixed(2);
+        buildRateChips(); render();
+      })
+      .catch(function () { /* keep backup rates */ });
+  }
+
+  /* ================= Core math ================= */
+  function deposits() {
+    if (state.mode === "custom") return state.custom.slice();
+    var m = parse($("monthly").value), lump = parse($("lump").value);
+    var arr = new Array(MONTHS).fill(m);
+    arr[0] += lump;
+    return arr;
+  }
+  function compute(dep, rate, keep) {
+    var r = rate / 100, bal = 0, rows = [], totD = 0, totC = 0;
+    for (var y = 0; y < TERM; y++) {
+      var c = 0, sum = 0;
+      for (var m = 0; m < 12; m++) { var d = dep[y * 12 + m] || 0; bal += d; c += d; sum += bal; }
+      var div = Math.round((sum / 12) * r * 100) / 100;
+      if (keep) bal += div;
+      totD += div; totC += c;
+      rows.push({ c: c, d: div, bal: bal, cumC: totC, cumD: totD });
+    }
+    return { rows: rows, totC: totC, totD: totD, end: bal };
+  }
+
+  /* ================= Count-up ================= */
+  var counters = {};
+  function countTo(el, to, fmt) {
+    var id = el.id, from = counters[id] != null ? counters[id] : 0;
+    counters[id] = to;
+    if (reduce || Math.abs(to - from) < 0.005) { el.textContent = fmt(to); return; }
+    var start = null, dur = 650;
+    if (el._raf) cancelAnimationFrame(el._raf);
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min(1, (ts - start) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = fmt(from + (to - from) * e);
+      if (p < 1) el._raf = requestAnimationFrame(step);
+    }
+    el._raf = requestAnimationFrame(step);
+  }
+
+  /* ================= Chart ================= */
+  var chart = $("chart");
+  for (var i = 0; i < TERM; i++) {
+    chart.insertAdjacentHTML("beforeend",
+      '<div class="bar"><div class="val num"></div><div class="col" style="height:0"><div class="d" style="height:0"></div><div class="c"></div></div></div>');
+  }
+  function drawChart(res, keep) {
+    var bars = chart.querySelectorAll(".bar");
+    var max = Math.max.apply(null, res.rows.map(function (r) { return r.cumC + r.cumD; }).concat([1]));
+    res.rows.forEach(function (r, i) {
+      var b = bars[i], total = r.cumC + r.cumD;
+      b.querySelector(".col").style.height = (total > 0 ? Math.max(3, total / max * 82) : 0) + "%";
+      b.querySelector(".d").style.height = total > 0 ? (r.cumD / total * 100) + "%" : "0";
+      b.querySelector(".val").textContent = total > 0 ? compact(total) : "";
+    });
+    $("chartNote").textContent = keep ? t("chartKeep") : t("chartPay");
+  }
+
+  /* ================= Render ================= */
+  function render() {
+    var rate = parse($("rate").value);
+    var keep = document.querySelector('input[name="payout"]:checked').value === "compound";
+    var res = compute(deposits(), rate, keep);
+    var grand = keep ? res.end : res.end + res.totD;
+
+    countTo($("oTotal"), grand, peso.format);
+    countTo($("oContrib"), res.totC, pesoShort.format);
+    countTo($("oDiv"), res.totD, pesoShort.format);
+    $("oDivLbl").textContent = keep ? t("divKeep") : t("divPay");
+
+    var pctA = grand > 0 ? res.totC / grand * 100 : 0;
+    $("splitA").style.width = pctA + "%";
+    $("splitB").style.width = (grand > 0 ? 100 - pctA : 0) + "%";
+
+    if (res.totC <= 0) $("oSentence").innerHTML = t("enter");
+    else if (keep) $("oSentence").innerHTML = t("sKeep")(pesoShort.format(res.totC), pesoShort.format(res.totD), plain.format(Math.round(res.totD / res.totC * 1000) / 10));
+    else $("oSentence").innerHTML = t("sPay")(pesoShort.format(res.end), pesoShort.format(res.totD));
+
+    drawChart(res, keep);
+
+    $("balHead").textContent = keep ? t("balKeep") : t("balPay");
+    $("tbody").innerHTML = res.rows.map(function (r, i) {
+      return "<tr><td>" + t("year") + " " + (i + 1) + "</td><td>" + peso.format(r.c) + "</td><td>" + peso.format(r.d) + "</td><td>" + peso.format(r.bal) + "</td></tr>";
+    }).join("");
+    $("tfoot").innerHTML = "<tr><td>" + t("total") + "</td><td>" + peso.format(res.totC) + "</td><td>" + peso.format(res.totD) + "</td><td>" + peso.format(res.end) + "</td></tr>";
+
+    var m = parse($("monthly").value);
+    $("monthlyWarn").hidden = !(state.mode === "simple" && m > 0 && m < MIN);
+    syncChips("monthlyChips", m);
+    syncChips("rateChips", rate);
+    if (state.mode === "custom") updateCustomMeta();
+
+    render.last = { res: res, keep: keep, rate: rate, grand: grand };
+  }
+  function syncChips(id, v) {
+    document.querySelectorAll("#" + id + " .chip").forEach(function (c) {
+      c.setAttribute("aria-pressed", Math.abs(parseFloat(c.dataset.v) - v) < 1e-9 ? "true" : "false");
+    });
+  }
+
+  /* ================= Mode tabs ================= */
+  function setMode(mode) {
+    state.mode = mode;
+    $("modeTabs").dataset.active = mode;
+    document.querySelectorAll("#modeTabs [role=tab]").forEach(function (tb) {
+      var on = tb.dataset.mode === mode;
+      tb.setAttribute("aria-selected", on); tb.tabIndex = on ? 0 : -1;
+    });
+    $("panel-simple").hidden = mode !== "simple";
+    $("panel-custom").hidden = mode !== "custom";
+    if (mode === "custom") buildGrid();
+    render();
+  }
+  $("modeTabs").addEventListener("click", function (e) {
+    var tb = e.target.closest("[role=tab]"); if (tb) setMode(tb.dataset.mode);
+  });
+  $("modeTabs").addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    var next = state.mode === "simple" ? "custom" : "simple";
+    setMode(next); $("tab-" + next).focus();
+  });
+
+  /* ================= Custom table ================= */
+  var now = new Date();
+  function fillStartMonths() {
+    var sm = $("startMonth"), keepV = sm.value || now.getMonth();
+    sm.innerHTML = t("monthsFull").map(function (n, i) { return '<option value="' + i + '">' + n + "</option>"; }).join("");
+    sm.value = keepV;
+  }
+  (function initStart() {
+    var sy = $("startYear");
+    for (var y = now.getFullYear() - 5; y <= now.getFullYear() + 3; y++) sy.insertAdjacentHTML("beforeend", '<option value="' + y + '">' + y + "</option>");
+    sy.value = now.getFullYear();
+    $("startMonth").addEventListener("change", buildGrid); sy.addEventListener("change", buildGrid);
+  })();
+
+  function monthLabel(idx) {
+    var m0 = +$("startMonth").value, y0 = +$("startYear").value, k = m0 + idx;
+    return t("months")[k % 12] + " " + (y0 + Math.floor(k / 12));
+  }
+  function buildGrid() {
+    var tabs = "";
+    for (var y = 0; y < TERM; y++) tabs += '<button role="tab" type="button" data-y="' + y + '" aria-selected="' + (y === state.year) + '"><b>' + t("year") + " " + (y + 1) + '</b><span class="ytot"></span></button>';
+    $("yearTabs").innerHTML = tabs;
+    var html = "";
+    for (var m = 0; m < 12; m++) {
+      var idx = state.year * 12 + m, v = state.custom[idx];
+      html += '<div class="month' + (v ? " filled" : "") + (v && v < MIN ? " low" : "") + '" data-i="' + idx + '">' +
+        '<label for="m' + idx + '">' + monthLabel(idx) + '</label>' +
+        '<div><span>₱</span><input id="m' + idx + '" inputmode="decimal" autocomplete="off" placeholder="' + t("blank") + '" value="' + (v ? plain.format(v) : "") + '"></div></div>';
+    }
+    $("monthGrid").innerHTML = html;
+    updateCustomMeta();
+  }
+  $("yearTabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    state.year = +b.dataset.y; buildGrid();
+  });
+  $("monthGrid").addEventListener("input", function (e) {
+    var box = e.target.closest(".month"); if (!box) return;
+    var v = parse(e.target.value);
+    state.custom[+box.dataset.i] = v;
+    box.classList.toggle("filled", v > 0);
+    box.classList.toggle("low", v > 0 && v < MIN);
+    render();
+  });
+  $("monthGrid").addEventListener("focusout", function (e) {
+    if (e.target.tagName !== "INPUT") return;
+    var v = parse(e.target.value); e.target.value = v ? plain.format(v) : "";
+  });
+  function updateCustomMeta() {
+    var tabs = document.querySelectorAll("#yearTabs button"), low = 0;
+    for (var y = 0; y < TERM; y++) {
+      var s = 0;
+      for (var m = 0; m < 12; m++) { var v = state.custom[y * 12 + m]; s += v; if (v && v < MIN) low++; }
+      if (tabs[y]) { tabs[y].querySelector(".ytot").textContent = s ? compact(s) : t("empty"); tabs[y].setAttribute("aria-selected", y === state.year); }
+    }
+    var w = $("customWarn"); w.hidden = !low; w.textContent = low ? t("low")(low) : "";
+  }
+  function flash() {
+    if (reduce) return;
+    document.querySelectorAll("#monthGrid .month").forEach(function (el, k) {
+      el.classList.remove("pop"); void el.offsetWidth; el.style.animationDelay = (k * 25) + "ms"; el.classList.add("pop");
+    });
+  }
+  $("fillYear").addEventListener("click", function () {
+    var v = parse($("fillAmt").value);
+    for (var m = 0; m < 12; m++) state.custom[state.year * 12 + m] = v;
+    buildGrid(); flash(); render();
+  });
+  $("copyAll").addEventListener("click", function () {
+    var src = state.custom.slice(state.year * 12, state.year * 12 + 12);
+    for (var y = 0; y < TERM; y++) for (var m = 0; m < 12; m++) state.custom[y * 12 + m] = src[m];
+    buildGrid(); flash(); render();
+  });
+  $("clearYear").addEventListener("click", function () { for (var m = 0; m < 12; m++) state.custom[state.year * 12 + m] = 0; buildGrid(); render(); });
+  $("clearAll").addEventListener("click", function () { state.custom.fill(0); buildGrid(); render(); });
+  $("fillAmt").addEventListener("blur", function () { var v = parse(this.value); this.value = v ? plain.format(v) : ""; });
+
+  /* ================= Simple inputs ================= */
+  ["monthly", "lump"].forEach(function (id) {
+    $(id).addEventListener("input", render);
+    $(id).addEventListener("blur", function () { var v = parse(this.value); this.value = v ? plain.format(v) : "0"; });
+  });
+  $("rate").addEventListener("input", function () { rateTouched = true; render(); });
+  $("monthlyChips").addEventListener("click", function (e) {
+    var c = e.target.closest(".chip"); if (!c) return;
+    $("monthly").value = plain.format(+c.dataset.v); render();
+  });
+  $("rateChips").addEventListener("click", function (e) {
+    var c = e.target.closest(".chip"); if (!c) return;
+    rateTouched = true; $("rate").value = (+c.dataset.v).toFixed(2); render();
+  });
+  document.querySelectorAll('input[name="payout"]').forEach(function (r) { r.addEventListener("change", render); });
+
+  /* ================= Copy results ================= */
+  $("copyRes").addEventListener("click", function () {
+    var L = render.last, btn = this; if (!L) return;
+    var lines = [
+      t("cTitle"),
+      t("cRate") + ": " + plain.format(L.rate) + "% " + t("cPer"),
+      t("cMode") + ": " + (L.keep ? t("cKeep") : t("cPay")),
+      t("cSaved") + ": " + peso.format(L.res.totC),
+      t("cDiv") + ": " + peso.format(L.res.totD),
+      t("cAfter") + ": " + peso.format(L.grand),
+      "", t("cYby") + ":"
+    ].concat(L.res.rows.map(function (r, i) { return t("cRow")(i + 1, peso.format(r.c), peso.format(r.d), peso.format(r.bal)); }));
+    var done = function (ok) { btn.textContent = ok ? t("copied") : t("copyFail"); setTimeout(function () { btn.textContent = t("copy"); }, 1600); };
+    try { navigator.clipboard.writeText(lines.join("\n")).then(function () { done(true); }, function () { done(false); }); }
+    catch (err) { done(false); }
+  });
+
+  /* ================= Scroll reveal ================= */
+  if ("IntersectionObserver" in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { threshold: 0.05 });
+    document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ================= Likes & view stats =================
+     Stored in this page's own database: one doc per viewer under
+     views/<id> ({visits}) and likes/<id> ({liked:true}).
+     No names, emails or calculator inputs are ever stored. */
+  var fmtInt = new Intl.NumberFormat("en-PH");
+  var stat = { db: null, uid: null, liked: false, ready: false, canWrite: true };
+  var likeBtn = $("likeBtn"), tipTimer = null;
+
+  function tip(msg) {
+    var el = $("likeTip"); el.textContent = msg; el.hidden = false;
+    clearTimeout(tipTimer); tipTimer = setTimeout(function () { el.hidden = true; }, 4000);
+  }
+  function paintLike() {
+    likeBtn.setAttribute("aria-pressed", stat.liked ? "true" : "false");
+  }
+  likeBtn.addEventListener("click", function () {
+    if (!stat.ready) { tip(t("likeOff")); return; }
+    if (!stat.canWrite) { tip(t("likeErr")); return; }
+    var want = !stat.liked, ref = stat.db.doc("likes/" + stat.uid);
+    stat.liked = want; paintLike();
+    if (want && !reduce) { likeBtn.classList.remove("beat"); void likeBtn.offsetWidth; likeBtn.classList.add("beat"); }
+    likeBtn.disabled = true;
+    (want ? ref.set({ liked: true }) : ref.delete())
+      .then(function () { if (want) tip(t("liked")); })
+      .catch(function () { stat.liked = !want; stat.canWrite = false; paintLike(); tip(t("likeErr")); })
+      .then(function () { likeBtn.disabled = false; });
+  });
+
+  function initStats() {
+    if (!window.claude || typeof window.claude.use !== "function") return;
+    Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (r) {
+      var db = r[0], user = r[1];
+      if (!db) return;
+      stat.db = db;
+      var loadTimer = setTimeout(function () {}, 10000);
+
+      db.collection("views").onSnapshot(function (snap) {
+        clearTimeout(loadTimer);
+        var visits = 0;
+        snap.docs.forEach(function (d) { var v = d.data(); visits += (v && +v.visits) || 1; });
+        $("stViews").textContent = fmtInt.format(visits);
+        var show = visits >= STATS_MIN_VIEWS;
+        $("stats").hidden = !show;
+        $("likeCount").hidden = !show;
+      }, function () {});
+
+      db.collection("likes").onSnapshot(function (snap) {
+        $("stLikes").textContent = fmtInt.format(snap.size);
+        $("likeCount").textContent = fmtInt.format(snap.size);
+        if (stat.uid) {
+          var mine = snap.docs.some(function (d) { return d.id === stat.uid; });
+          if (!likeBtn.disabled) { stat.liked = mine; paintLike(); }
+        }
+      }, function () {});
+
+      return user ? user.id() : null;
+    }).then(function (uid) {
+      if (!uid || !stat.db) return;
+      stat.uid = uid; stat.ready = true;
+      var ref = stat.db.doc("views/" + uid);
+      ref.get().then(function (d) {
+        var n = d.exists ? ((+d.data().visits) || 0) + 1 : 1;
+        return ref.set({ visits: n });
+      }).catch(function () { stat.canWrite = false; });
+    }).catch(function () {});
+  }
+
+  /* ================= Feedback =================
+     Each viewer's submissions live in feedback/<their id> as {entries:[...]}.
+     Only the owner can read them all and export them as a .txt file. */
+  var fb = { last: null, sending: false };
+  var modal = $("fbModal"), lastFocus = null;
+
+  function openFb() {
+    lastFocus = document.activeElement;
+    $("fbForm").hidden = false; $("fbDone").hidden = true; $("fbWarn").hidden = true;
+    modal.hidden = false;
+    setTimeout(function () { $("fbComment").focus(); }, 50);
+  }
+  function closeFb() { modal.hidden = true; if (lastFocus) lastFocus.focus(); }
+  $("fbBtn").addEventListener("click", openFb);
+  modal.addEventListener("click", function (e) { if (e.target === modal || e.target.closest("[data-close]")) closeFb(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) closeFb(); });
+
+  function entryText(e) {
+    var F = t("fbFile");
+    return F.date + ": " + e.at + "\n" + F.name + ": " + (e.name || F.none) + "\n" + F.email + ": " + (e.email || F.none) + "\n" + F.comment + ":\n" + e.comment + "\n";
+  }
+  function saveTxt(filename, text) {
+    if (!window.claude) return Promise.reject();
+    return window.claude.use("downloads").then(function (dl) {
+      if (!dl) throw 0;
+      return dl.save({ filename: filename, data: text });
+    });
+  }
+  function stamp() { var d = new Date(); return d.toISOString().slice(0, 10); }
+
+  $("fbForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (fb.sending) return;
+    var name = $("fbName").value.trim(), email = $("fbEmail").value.trim(), comment = $("fbComment").value.trim();
+    var w = $("fbWarn");
+    if (!comment) { w.textContent = t("fbNeed"); w.hidden = false; $("fbComment").focus(); return; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { w.textContent = t("fbBadEmail"); w.hidden = false; $("fbEmail").focus(); return; }
+    w.hidden = true;
+    var entry = { name: name.slice(0, 80), email: email.slice(0, 120), comment: comment.slice(0, 2000), at: new Date().toISOString(), lang: lang, v: APP_VERSION };
+    fb.last = entry;
+
+    function done(sent) {
+      $("fbDoneH").textContent = sent ? t("fbSentH") : t("fbLocalH");
+      $("fbDoneP").textContent = sent ? t("fbSentP") : t("fbLocalP");
+      $("fbForm").hidden = true; $("fbDone").hidden = false;
+      $("fbName").value = ""; $("fbEmail").value = ""; $("fbComment").value = "";
+    }
+    if (!stat.db || !stat.uid || !stat.canWrite) { done(false); return; }
+
+    fb.sending = true; var btn = $("fbSend"); btn.textContent = t("fbSending"); btn.disabled = true;
+    var ref = stat.db.doc("feedback/" + stat.uid);
+    ref.get().then(function (d) {
+      var list = d.exists && Array.isArray(d.data().entries) ? d.data().entries.slice() : [];
+      list.push(entry);
+      if (list.length > 50) list = list.slice(-50);
+      return ref.set({ entries: list });
+    }).then(function () { done(true); })
+      .catch(function (err) {
+        if (err && err.code === "invalid_argument") { stat.canWrite = false; done(false); }
+        else { w.textContent = t("fbErr"); w.hidden = false; }
+      })
+      .then(function () { fb.sending = false; btn.disabled = false; btn.textContent = lang === "tl" ? TL.fm_send : EN.fm_send; });
+  });
+
+  $("fbComment").addEventListener("input", function () { $("fbWarn").hidden = true; });
+  $("fbCopy").addEventListener("click", function () {
+    if (!fb.last) return;
+    var b = this;
+    saveTxt("mp2-feedback-" + stamp() + ".txt", t("fbFile").title + "\n\n" + entryText(fb.last))
+      .then(function () { b.textContent = t("saved"); }, function () {});
+  });
+
+  /* Likes, views and feedback need the claude.ai page runtime.
+     On other hosts (e.g. GitHub Pages) hide them so nothing looks broken. */
+  if (!window.claude || typeof window.claude.use !== "function") {
+    document.querySelector(".fab").hidden = true;
+    $("stats").hidden = true;
+  }
+
+  $("verTag").textContent = "v" + APP_VERSION;
+  $("verTag2").textContent = "v" + APP_VERSION;
+  $("cyear").textContent = now.getFullYear();
+  $("rate").value = latest().r.toFixed(2);
+  setLang("en", false);
+  loadRates();
+  initStats();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# ==================================================================
+#   MP2 DIVIDEND RATES  —  edit this file to update the calculator
+# ==================================================================
+#
+# The calculator reads this file every time someone opens or refreshes
+# the page. The NEWEST year below is used as the "Latest" rate.
+#
+# ------------------------------------------------------------------
+# WHERE TO FIND THE NEW RATE
+# ------------------------------------------------------------------
+#   When:   Pag-IBIG Fund usually announces the MP2 rate once a year,
+#           around late February to March, for the year that just
+#           ended. (Example: the 2025 rate of 7.12% was announced
+#           on February 27, 2026.)
+#
+#   Where:  1. Pag-IBIG Fund official website, News / Press Releases
+#              https://www.pagibigfund.gov.ph
+#           2. Pag-IBIG Fund's official Facebook page
+#           3. Major news sites (GMA, Inquirer, Philstar, Manila Bulletin)
+#
+#   Search: "Pag-IBIG declares dividends 2026 MP2"
+#           (change the year to the one you're looking for)
+#
+# ------------------------------------------------------------------
+# HOW TO UPDATE
+# ------------------------------------------------------------------
+#   1. Add a new line at the bottom in this format:   YEAR = RATE
+#      Example:   2026 = 7.20
+#   2. Use a period for decimals (7.20, not 7,20). No % sign needed.
+#   3. Don't delete old years. The quick buttons use the last 3 years,
+#      and the "Cautious" button uses the lowest of the last 5 years.
+#   4. Lines that start with # are notes. The calculator ignores them.
+#
+# ==================================================================
+
+2020 = 6.12
+2021 = 6.00
+2022 = 7.03
+2023 = 7.05
+2024 = 7.10
+2025 = 7.12
