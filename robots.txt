@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mp2calculator.useful-indeed.com/sitemap.xml

@@ -412,6 +412,12 @@
   details.changelog summary { cursor: pointer; font-weight: 700; color: var(--ink); }
   details.changelog ul { margin: 8px 0 0; padding-left: 20px; }
 </style>
+<link rel="stylesheet" href="useful-indeed/footer.css">
+<script src="version-log.js"></script>
+<link rel="canonical" href="https://mp2calculator.useful-indeed.com/">
+<link rel="icon" type="image/svg+xml" href="logo.svg">
+<link rel="apple-touch-icon" href="logo.svg">
+<style id="useful-indeed-mobile">.brand .ui-applogo{width:38px;height:38px;border-radius:10px;display:block;flex:none}</style>
 </head>
 <body>
 
@@ -424,15 +430,7 @@
 <div class="wrap">
   <header class="top">
     <a class="brand" href="#top" aria-label="MP2 Calculator">
-      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
-        <rect width="44" height="44" rx="12" fill="#0f5b46"/>
-        <g fill="#e9a512">
-          <rect x="9" y="27" width="7" height="8" rx="2"/>
-          <rect x="18.5" y="21" width="7" height="14" rx="2"/>
-          <rect x="28" y="13" width="7" height="22" rx="2"/>
-        </g>
-        <circle cx="31.5" cy="8.5" r="3" fill="#fff"/>
-      </svg>
+      <img class="ui-applogo" src="logo.svg" alt="" width="38" height="38">
       <span class="brand-name">MP2 Calculator<small data-i18n="brand_sub">Unofficial savings estimator</small></span>
     </a>
     <div class="top-right">
@@ -685,62 +683,19 @@
     <p data-i18n="ft3">This website is an independent tool and is not associated with Pag-IBIG Fund (HDMF).</p>
     <p class="privacy">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-      <span data-i18n="ft4">Nothing you type here is saved or sent anywhere. All math runs in your browser and disappears when you close the page. The only things recorded are page views and likes (counted with an anonymous ID), and feedback you choose to send. Calculator inputs are never recorded.</span>
+      <span data-i18n="ft4">Nothing you type here is saved or sent anywhere. All math runs in your browser and disappears when you close the page.</span>
     </p>
-    <div class="stats" id="stats" aria-live="polite" hidden>
-      <div class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><b id="stViews">—</b><span data-i18n="st_views">views</span></div>
-      <div class="stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg><b id="stLikes">—</b><span data-i18n="st_likes">likes</span></div>
-    </div>
-    <details class="changelog">
+    <details class="changelog" hidden style="display:none!important">
       <summary><span class="ver"><code id="verTag">v1.0</code> <span data-i18n="v_whats">What's in this version</span></span></summary>
       <div data-i18n="v_log"><ul><li><b>v1.0</b> (November 2026): first release. MP2 perks, same-amount and custom monthly calculators, how-to-start guide, English and Tagalog, FAQs, likes, views and feedback.</li></ul></div>
     </details>
     <div class="copyright">
-      <span>© <span id="cyear">2026</span> MP2 Calculator · <span id="verTag2">v1.0</span>. <span data-i18n="ft_rights">All rights reserved.</span></span>
+      <span hidden style="display:none!important">© <span id="cyear">2026</span> MP2 Calculator · <span id="verTag2">v1.0</span>. <span data-i18n="ft_rights">All rights reserved.</span></span>
       <span data-i18n="ft_tm">Pag-IBIG Fund and MP2 are names of the Home Development Mutual Fund, used here only for reference.</span>
     </div>
   </footer>
 </div>
 
-<div class="fab">
-<button type="button" class="fbtn" id="fbBtn" aria-haspopup="dialog">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="lbl" data-i18n="fb_lbl">Feedback</span>
-</button>
-<button type="button" class="like" id="likeBtn" aria-pressed="false" aria-label="Like this calculator">
-  <span class="burst" aria-hidden="true"><i style="--a:0deg"></i><i style="--a:60deg"></i><i style="--a:120deg"></i><i style="--a:180deg"></i><i style="--a:240deg"></i><i style="--a:300deg"></i></span>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path class="heart" stroke-linejoin="round" d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-  <span class="lc" id="likeCount" hidden>0</span>
-  <span class="lbl" data-i18n="like_lbl">Like</span>
-</button>
-</div>
-
-<div class="modal" id="fbModal" role="dialog" aria-modal="true" aria-labelledby="fbTitle" hidden>
-  <div class="sheet">
-    <form id="fbForm" novalidate>
-      <h3 id="fbTitle" data-i18n="fm_h">Send feedback</h3>
-      <p data-i18n="fm_p">Found a bug, have an idea, or a question? Tell us. It takes 30 seconds.</p>
-      <div class="field"><label for="fbName"><span data-i18n="fm_name">Name</span> <span class="opt" data-i18n="fm_opt">(optional)</span></label><input type="text" id="fbName" maxlength="80" autocomplete="name"></div>
-      <div class="field"><label for="fbEmail"><span data-i18n="fm_email">Email</span> <span class="opt" data-i18n="fm_opt2">(optional, if you want a reply)</span></label><input type="email" id="fbEmail" maxlength="120" autocomplete="email"></div>
-      <div class="field"><label for="fbComment" data-i18n="fm_comment">Your comment</label><textarea id="fbComment" maxlength="2000" required></textarea><div class="warn" id="fbWarn" hidden></div></div>
-      <div class="row-btns">
-        <button type="button" class="sbtn" data-close data-i18n="fm_cancel">Cancel</button>
-        <button type="submit" class="sbtn primary" id="fbSend" data-i18n="fm_send">Send feedback</button>
-      </div>
-      <p class="note" data-i18n="fm_note">Only the site owner can read feedback. Don't include passwords, MID numbers, or other private details.</p>
-    </form>
-    <div class="done" id="fbDone" hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path class="ck" d="M7.5 12.5l3 3 6-6.5"/></svg>
-      <h3 id="fbDoneH"></h3>
-      <p id="fbDoneP" style="color:var(--muted);margin:6px 0 16px"></p>
-      <div class="row-btns" style="justify-content:center">
-        <button type="button" class="sbtn" id="fbCopy" data-i18n="fm_dl">Save a copy (.txt)</button>
-        <button type="button" class="sbtn primary" data-close data-i18n="fm_close">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="like-tip" id="likeTip" role="status" hidden></div>
 
 <script>
 (function () {
@@ -841,7 +796,7 @@
     ft1: "Pagtatantya lang ito. Hindi fixed ang MP2 dividends; ang Pag-IBIG Fund ang nagdedeklara ng rate bawat taon base sa kinita nito. Hindi garantiya ng mga lumang rate ang mga susunod.",
     ft2: "Paano kinompute: ina-assume na naghuhulog sa simula ng bawat buwan, at ang dividend bawat taon ay ang rate na inilapat sa average na buwanang balanse, katulad ng paraan ng Pag-IBIG na gumagamit ng average daily balance. Medyo mag-iiba ang aktwal na halaga depende sa petsa ng pagpasok ng hulog. ₱500 ang pinakamababang hulog sa MP2.",
     ft3: "Ang website na ito ay independent na tool at hindi konektado sa Pag-IBIG Fund (HDMF).",
-    ft4: "Walang sine-save o ipinapadala kahit saan sa mga tina-type mo rito. Sa browser mo lang ginagawa ang lahat ng compute, at nawawala ito pagsara mo ng page. Ang tanging nire-record ay ang bilang ng views at likes, gamit ang anonymous ID (walang pangalan, walang email, walang input sa calculator).",
+    ft4: "Walang sine-save o ipinapadala kahit saan sa mga tina-type mo rito. Sa browser mo lang ginagawa ang lahat ng compute, at nawawala ito pagsara mo ng page.",
     st_views: "views",
     rc: "Gusto mo ang resulta? Ganito magsimula ng MP2.",
     cta_h: "Pasasalamatan ka ng future self mo. <em>Simulan ang MP2 mo ngayon.</em>",
@@ -881,7 +836,7 @@
       srcOk: function (r, y) { return "Latest declared rate: " + r + "% for " + y; },
       srcOff: function (r, y) { return "Using saved rate: " + r + "% for " + y; },
       copy: "Copy my results", copied: "Copied!", copyFail: "Couldn't copy",
-      likeOff: "Likes and views are counted only when this page is opened on claude.ai by a signed-in viewer who has access.", likeErr: "Your like couldn't be saved. Your access to this page may be view-only.", liked: "Thanks for the like!",
+      likeOff: "Likes aren't available right now.", likeErr: "Your like couldn't be saved. Your access to this page may be view-only.", liked: "Thanks for the like!",
       fbNeed: "Please write a comment first.", fbBadEmail: "That email doesn't look right.",
       fbSentH: "Thank you!", fbSentP: "Your feedback was sent to the site owner.",
       fbLocalH: "Almost there", fbLocalP: "Feedback can't be sent from this view. Save it as a text file and share it with the site owner.",
@@ -908,7 +863,7 @@
       srcOk: function (r, y) { return "Pinakabagong rate: " + r + "% para sa " + y; },
       srcOff: function (r, y) { return "Naka-save na rate: " + r + "% para sa " + y; },
       copy: "Kopyahin ang resulta", copied: "Nakopya na!", copyFail: "Hindi nakopya",
-      likeOff: "Nabibilang lang ang likes at views kapag binuksan ang page na ito sa claude.ai ng naka-sign in na may access.", likeErr: "Hindi na-save ang like mo. Baka view-only ang access mo sa page na ito.", liked: "Salamat sa like!",
+      likeOff: "Hindi available ang likes ngayon.", likeErr: "Hindi na-save ang like mo. Baka view-only ang access mo sa page na ito.", liked: "Salamat sa like!",
       fbNeed: "Pakisulat muna ang komento mo.", fbBadEmail: "Mukhang mali ang email.",
       fbSentH: "Salamat!", fbSentP: "Naipadala na ang feedback mo sa may-ari ng site.",
       fbLocalH: "Konti na lang", fbLocalP: "Hindi maipadala ang feedback mula rito. I-save ito bilang text file at ibigay sa may-ari ng site.",
@@ -1249,160 +1204,21 @@
     document.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
   }
 
-  /* ================= Likes & view stats =================
-     Stored in this page's own database: one doc per viewer under
-     views/<id> ({visits}) and likes/<id> ({liked:true}).
-     No names, emails or calculator inputs are ever stored. */
-  var fmtInt = new Intl.NumberFormat("en-PH");
-  var stat = { db: null, uid: null, liked: false, ready: false, canWrite: true };
-  var likeBtn = $("likeBtn"), tipTimer = null;
-
-  function tip(msg) {
-    var el = $("likeTip"); el.textContent = msg; el.hidden = false;
-    clearTimeout(tipTimer); tipTimer = setTimeout(function () { el.hidden = true; }, 4000);
-  }
-  function paintLike() {
-    likeBtn.setAttribute("aria-pressed", stat.liked ? "true" : "false");
-  }
-  likeBtn.addEventListener("click", function () {
-    if (!stat.ready) { tip(t("likeOff")); return; }
-    if (!stat.canWrite) { tip(t("likeErr")); return; }
-    var want = !stat.liked, ref = stat.db.doc("likes/" + stat.uid);
-    stat.liked = want; paintLike();
-    if (want && !reduce) { likeBtn.classList.remove("beat"); void likeBtn.offsetWidth; likeBtn.classList.add("beat"); }
-    likeBtn.disabled = true;
-    (want ? ref.set({ liked: true }) : ref.delete())
-      .then(function () { if (want) tip(t("liked")); })
-      .catch(function () { stat.liked = !want; stat.canWrite = false; paintLike(); tip(t("likeErr")); })
-      .then(function () { likeBtn.disabled = false; });
-  });
-
-  function initStats() {
-    if (!window.claude || typeof window.claude.use !== "function") return;
-    Promise.all([window.claude.use("db"), window.claude.use("user")]).then(function (r) {
-      var db = r[0], user = r[1];
-      if (!db) return;
-      stat.db = db;
-      var loadTimer = setTimeout(function () {}, 10000);
-
-      db.collection("views").onSnapshot(function (snap) {
-        clearTimeout(loadTimer);
-        var visits = 0;
-        snap.docs.forEach(function (d) { var v = d.data(); visits += (v && +v.visits) || 1; });
-        $("stViews").textContent = fmtInt.format(visits);
-        var show = visits >= STATS_MIN_VIEWS;
-        $("stats").hidden = !show;
-        $("likeCount").hidden = !show;
-      }, function () {});
-
-      db.collection("likes").onSnapshot(function (snap) {
-        $("stLikes").textContent = fmtInt.format(snap.size);
-        $("likeCount").textContent = fmtInt.format(snap.size);
-        if (stat.uid) {
-          var mine = snap.docs.some(function (d) { return d.id === stat.uid; });
-          if (!likeBtn.disabled) { stat.liked = mine; paintLike(); }
-        }
-      }, function () {});
-
-      return user ? user.id() : null;
-    }).then(function (uid) {
-      if (!uid || !stat.db) return;
-      stat.uid = uid; stat.ready = true;
-      var ref = stat.db.doc("views/" + uid);
-      ref.get().then(function (d) {
-        var n = d.exists ? ((+d.data().visits) || 0) + 1 : 1;
-        return ref.set({ visits: n });
-      }).catch(function () { stat.canWrite = false; });
-    }).catch(function () {});
-  }
-
-  /* ================= Feedback =================
-     Each viewer's submissions live in feedback/<their id> as {entries:[...]}.
-     Only the owner can read them all and export them as a .txt file. */
-  var fb = { last: null, sending: false };
-  var modal = $("fbModal"), lastFocus = null;
-
-  function openFb() {
-    lastFocus = document.activeElement;
-    $("fbForm").hidden = false; $("fbDone").hidden = true; $("fbWarn").hidden = true;
-    modal.hidden = false;
-    setTimeout(function () { $("fbComment").focus(); }, 50);
-  }
-  function closeFb() { modal.hidden = true; if (lastFocus) lastFocus.focus(); }
-  $("fbBtn").addEventListener("click", openFb);
-  modal.addEventListener("click", function (e) { if (e.target === modal || e.target.closest("[data-close]")) closeFb(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) closeFb(); });
-
-  function entryText(e) {
-    var F = t("fbFile");
-    return F.date + ": " + e.at + "\n" + F.name + ": " + (e.name || F.none) + "\n" + F.email + ": " + (e.email || F.none) + "\n" + F.comment + ":\n" + e.comment + "\n";
-  }
-  function saveTxt(filename, text) {
-    if (!window.claude) return Promise.reject();
-    return window.claude.use("downloads").then(function (dl) {
-      if (!dl) throw 0;
-      return dl.save({ filename: filename, data: text });
-    });
-  }
-  function stamp() { var d = new Date(); return d.toISOString().slice(0, 10); }
-
-  $("fbForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    if (fb.sending) return;
-    var name = $("fbName").value.trim(), email = $("fbEmail").value.trim(), comment = $("fbComment").value.trim();
-    var w = $("fbWarn");
-    if (!comment) { w.textContent = t("fbNeed"); w.hidden = false; $("fbComment").focus(); return; }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { w.textContent = t("fbBadEmail"); w.hidden = false; $("fbEmail").focus(); return; }
-    w.hidden = true;
-    var entry = { name: name.slice(0, 80), email: email.slice(0, 120), comment: comment.slice(0, 2000), at: new Date().toISOString(), lang: lang, v: APP_VERSION };
-    fb.last = entry;
-
-    function done(sent) {
-      $("fbDoneH").textContent = sent ? t("fbSentH") : t("fbLocalH");
-      $("fbDoneP").textContent = sent ? t("fbSentP") : t("fbLocalP");
-      $("fbForm").hidden = true; $("fbDone").hidden = false;
-      $("fbName").value = ""; $("fbEmail").value = ""; $("fbComment").value = "";
-    }
-    if (!stat.db || !stat.uid || !stat.canWrite) { done(false); return; }
-
-    fb.sending = true; var btn = $("fbSend"); btn.textContent = t("fbSending"); btn.disabled = true;
-    var ref = stat.db.doc("feedback/" + stat.uid);
-    ref.get().then(function (d) {
-      var list = d.exists && Array.isArray(d.data().entries) ? d.data().entries.slice() : [];
-      list.push(entry);
-      if (list.length > 50) list = list.slice(-50);
-      return ref.set({ entries: list });
-    }).then(function () { done(true); })
-      .catch(function (err) {
-        if (err && err.code === "invalid_argument") { stat.canWrite = false; done(false); }
-        else { w.textContent = t("fbErr"); w.hidden = false; }
-      })
-      .then(function () { fb.sending = false; btn.disabled = false; btn.textContent = lang === "tl" ? TL.fm_send : EN.fm_send; });
-  });
-
-  $("fbComment").addEventListener("input", function () { $("fbWarn").hidden = true; });
-  $("fbCopy").addEventListener("click", function () {
-    if (!fb.last) return;
-    var b = this;
-    saveTxt("mp2-feedback-" + stamp() + ".txt", t("fbFile").title + "\n\n" + entryText(fb.last))
-      .then(function () { b.textContent = t("saved"); }, function () {});
-  });
-
-  /* Likes, views and feedback need the claude.ai page runtime.
-     On other hosts (e.g. GitHub Pages) hide them so nothing looks broken. */
-  if (!window.claude || typeof window.claude.use !== "function") {
-    document.querySelector(".fab").hidden = true;
-    $("stats").hidden = true;
-  }
-
   $("verTag").textContent = "v" + APP_VERSION;
   $("verTag2").textContent = "v" + APP_VERSION;
   $("cyear").textContent = now.getFullYear();
   $("rate").value = latest().r.toFixed(2);
   setLang("en", false);
   loadRates();
-  initStats();
 })();
 </script>
+<footer class="ui-foot">
+  <div class="ui-foot-in">
+    <a class="ui-foot-brand" href="https://useful-indeed.com" title="More small, free tools on useful-indeed"><img src="useful-indeed/logo.svg" alt="useful-indeed logo" width="22" height="22"><span>© <span data-ui-year>2026</span> <b>useful-indeed</b></span></a>
+    <nav class="ui-foot-nav" aria-label="Site"><a href="about.html">About</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="contact.html">Contact</a></nav>
+    <button type="button" class="ui-foot-ver" data-ui-ver>v1.0 · Version log</button>
+  </div>
+</footer>
+<script src="useful-indeed/badge.js" defer></script>
 </body>
 </html>
