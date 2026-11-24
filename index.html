@@ -5,10 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pag-IBIG MP2 Calculator – Estimate Your 5-Year Savings</title>
 <meta name="description" content="Unofficial Pag-IBIG MP2 calculator. See how your MP2 savings could grow in 5 years with monthly or custom deposits and past dividend rates, in English or Tagalog. Free, no sign-up.">
+<meta property="og:site_name" content="useful-indeed">
 <meta property="og:title" content="Pag-IBIG MP2 Calculator – Estimate Your 5-Year Savings">
 <meta property="og:description" content="Unofficial Pag-IBIG MP2 calculator. See how your MP2 savings could grow in 5 years with monthly or custom deposits and past dividend rates, in English or Tagalog. Free, no sign-up.">
 <meta property="og:url" content="https://mp2calculator.useful-indeed.com/">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://mp2calculator.useful-indeed.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QZY61DZ0G"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-9QZY61DZ0G');</script>
 <meta name="version" content="1.0">
 <style>
   :root {
@@ -530,7 +537,6 @@
           <button role="tab" id="tab-custom" aria-controls="panel-custom" aria-selected="false" data-mode="custom" tabindex="-1" data-i18n="tab2">My own amounts<small>fill in a table</small></button>
         </div>
 
-        <!-- Simple -->
         <div class="panel" id="panel-simple" role="tabpanel" aria-labelledby="tab-simple">
           <div class="field">
             <label for="monthly" data-i18n="s_monthly">How much will you save every month?</label>
@@ -550,7 +556,6 @@
           </div>
         </div>
 
-        <!-- Custom -->
         <div class="panel" id="panel-custom" role="tabpanel" aria-labelledby="tab-custom" hidden>
           <div class="field">
             <span class="label" data-i18n="u_start">When is your first deposit?</span>
