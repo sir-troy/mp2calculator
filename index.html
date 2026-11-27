@@ -918,6 +918,7 @@
   var rateTouched = false;
 
   function parse(v) {
+    if (/^\s*[₱P]?\s*-/i.test(String(v))) return 0; // negative amounts are not allowed
     var n = parseFloat(String(v).replace(/[^0-9.]/g, ""));
     return isFinite(n) && n > 0 ? n : 0;
   }
